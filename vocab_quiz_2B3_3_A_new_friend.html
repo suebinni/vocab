@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocabulary Quiz — A New Friend</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --border: #2e2e2e;
+    --accent: #c8f564;
+    --accent2: #64c8f5;
+    --text: #e8e8e8;
+    --muted: #666;
+    --correct: #4ade80;
+    --wrong: #f87171;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem 4rem;
+  }
+  header { width: 100%; max-width: 720px; margin-bottom: 2rem; }
+  .label { font-size: 0.62rem; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; margin-bottom: 0.4rem; }
+  h1 { font-size: 1.5rem; font-weight: 500; color: var(--accent); letter-spacing: -0.02em; }
+  .subtitle { font-size: 0.72rem; color: var(--muted); margin-top: 0.3rem; }
+
+  .controls {
+    width: 100%;
+    max-width: 720px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+  }
+  .mode-btn {
+    padding: 0.55rem 0.5rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .mode-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(200,245,100,0.06); }
+  .mode-btn:hover:not(.active) { border-color: #444; color: var(--text); }
+
+  .progress-bar-wrap { width: 100%; max-width: 720px; margin-bottom: 2rem; }
+  .progress-meta { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--muted); margin-bottom: 0.4rem; }
+  .progress-bar { height: 2px; background: var(--border); }
+  .progress-fill { height: 100%; background: var(--accent); transition: width 0.4s ease; }
+
+  .card {
+    width: 100%;
+    max-width: 720px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 2.2rem 2rem 1.8rem;
+    margin-bottom: 1.2rem;
+    animation: fadeIn 0.2s ease;
+  }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+  .q-type { font-size: 0.6rem; letter-spacing: 0.18em; color: var(--accent2); text-transform: uppercase; margin-bottom: 0.9rem; }
+  .q-word { font-size: 1.9rem; font-weight: 500; letter-spacing: -0.02em; color: var(--text); margin-bottom: 0.3rem; font-family: 'Gowun Dodum', sans-serif; }
+  .q-hint { font-size: 0.7rem; color: var(--muted); margin-bottom: 1.8rem; }
+
+  .sentence-box { margin-bottom: 1.6rem; }
+  .sentence-en { font-size: 1rem; color: var(--text); line-height: 1.9; margin-bottom: 0.6rem; font-family: 'Gowun Dodum', sans-serif; }
+  .blank {
+    display: inline-block;
+    border-bottom: 2px solid var(--accent);
+    min-width: 70px;
+    color: var(--accent);
+    font-weight: 500;
+    padding: 0 4px;
+    letter-spacing: 0.05em;
+    text-align: center;
+  }
+  .blank.revealed { color: var(--correct); border-color: var(--correct); }
+  .sentence-ko { font-size: 0.83rem; color: var(--muted); font-family: 'Gowun Dodum', sans-serif; line-height: 1.7; padding-left: 0.6rem; border-left: 2px solid var(--border); }
+
+  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; }
+  .option {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    font-family: 'Gowun Dodum', sans-serif;
+    font-size: 0.88rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.12s;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    line-height: 1.4;
+  }
+  .option:hover:not(:disabled) { border-color: var(--accent); background: rgba(200,245,100,0.04); }
+  .option.correct { border-color: var(--correct); background: rgba(74,222,128,0.08); color: var(--correct); }
+  .option.wrong { border-color: var(--wrong); background: rgba(248,113,113,0.08); color: var(--wrong); }
+  .option-key { font-size: 0.6rem; letter-spacing: 0.1em; color: var(--muted); font-family: 'DM Mono', monospace; min-width: 1rem; flex-shrink: 0; }
+  .option.correct .option-key { color: var(--correct); }
+  .option.wrong .option-key { color: var(--wrong); }
+
+  .feedback { margin-top: 1rem; padding: 0.75rem 1rem; font-size: 0.78rem; border-left: 2px solid transparent; display: none; }
+  .feedback.show { display: block; }
+  .feedback.correct { border-color: var(--correct); color: var(--correct); }
+  .feedback.wrong { border-color: var(--wrong); color: var(--wrong); }
+
+  .nav { width: 100%; max-width: 720px; display: flex; justify-content: flex-end; }
+  .next-btn {
+    padding: 0.65rem 1.5rem;
+    background: var(--accent);
+    color: #0f0f0f;
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    display: none;
+    transition: opacity 0.15s;
+  }
+  .next-btn:hover { opacity: 0.85; }
+  .next-btn.show { display: block; }
+
+  .result { width: 100%; max-width: 720px; display: none; flex-direction: column; gap: 1.5rem; animation: fadeIn 0.3s ease; }
+  .result.show { display: flex; }
+  .result-score { font-size: 3.8rem; font-weight: 500; color: var(--accent); letter-spacing: -0.04em; line-height: 1; }
+  .result-sub { font-size: 0.78rem; color: var(--muted); margin-top: 0.3rem; }
+  .result-breakdown { border: 1px solid var(--border); background: var(--surface); max-height: 400px; overflow-y: auto; }
+  .breakdown-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.65rem 1rem; border-bottom: 1px solid var(--border);
+    font-size: 0.73rem; gap: 0.8rem;
+  }
+  .breakdown-row:last-child { border-bottom: none; }
+  .breakdown-word { font-family: 'Gowun Dodum', sans-serif; flex: 1; }
+  .breakdown-type { font-size: 0.58rem; color: var(--muted); letter-spacing: 0.05em; white-space: nowrap; }
+  .breakdown-status { font-size: 0.7rem; white-space: nowrap; }
+  .ok { color: var(--correct); }
+  .fail { color: var(--wrong); }
+  .restart-btn {
+    align-self: flex-start;
+    padding: 0.65rem 1.5rem;
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .restart-btn:hover { background: var(--accent); color: #0f0f0f; }
+
+  .json-block { width: 100%; max-width: 720px; margin-top: 2.5rem; border: 1px solid var(--border); background: var(--surface); }
+  .json-header { display: flex; justify-content: space-between; align-items: center; padding: 0.55rem 1rem; border-bottom: 1px solid var(--border); cursor: pointer; }
+  .json-header span { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.12em; }
+  .json-toggle { font-size: 0.62rem; color: var(--accent2); letter-spacing: 0.1em; }
+  .json-content { display: none; padding: 1rem; font-size: 0.68rem; color: #888; white-space: pre-wrap; word-break: break-all; max-height: 300px; overflow-y: auto; line-height: 1.6; }
+  .json-content.open { display: block; }
+  .copy-btn { padding: 0.35rem 0.7rem; background: transparent; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.62rem; cursor: pointer; letter-spacing: 0.05em; }
+  .copy-btn:hover { color: var(--text); border-color: #444; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="label">Vocabulary Practice — Trophy 9 / 2B Unit 3</div>
+  <h1>A New Friend</h1>
+  <div class="subtitle">22 words</div>
+</header>
+
+<div class="controls">
+  <button class="mode-btn active" onclick="setMode('en2ko')">① 영어<br>→ 한국어</button>
+  <button class="mode-btn" onclick="setMode('ko2en')">② 한국어<br>→ 영어</button>
+  <button class="mode-btn" onclick="setMode('blank')">③ 예문<br>빈칸</button>
+  <button class="mode-btn" onclick="setMode('mixed')">④ 혼합</button>
+</div>
+
+<div class="progress-bar-wrap">
+  <div class="progress-meta">
+    <span id="prog-label">0 / 0</span>
+    <span id="score-label">정답 0</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+</div>
+
+<div class="card" id="quiz-card">
+  <div class="q-type" id="q-type"></div>
+  <div class="q-word" id="q-word"></div>
+  <div class="q-hint" id="q-hint"></div>
+  <div class="sentence-box" id="sentence-box" style="display:none">
+    <div class="sentence-en" id="sentence-en"></div>
+    <div class="sentence-ko" id="sentence-ko"></div>
+  </div>
+  <div class="options" id="options"></div>
+  <div class="feedback" id="feedback"></div>
+</div>
+
+<div class="nav">
+  <button class="next-btn" id="next-btn" onclick="next()">다음 →</button>
+</div>
+
+<div class="result" id="result">
+  <div>
+    <div class="result-score" id="result-score"></div>
+    <div class="result-sub" id="result-sub"></div>
+  </div>
+  <div class="result-breakdown" id="breakdown"></div>
+  <button class="restart-btn" onclick="restart()">다시 풀기</button>
+</div>
+
+<div class="json-block">
+  <div class="json-header" onclick="toggleJson()">
+    <span>RAW JSON DATA</span>
+    <div style="display:flex;gap:0.5rem;align-items:center">
+      <button class="copy-btn" onclick="event.stopPropagation();copyJson()">COPY</button>
+      <span class="json-toggle" id="json-toggle">SHOW ▾</span>
+    </div>
+  </div>
+  <div class="json-content" id="json-content"></div>
+</div>
+
+<script>
+const VOCAB = [
+  { en: "catch",         ko: "잡다",                exEn: "\"I'll catch it,\" said Ellen.",                                       exKo: "\"내가 잡을게,\" Ellen이 말했다." },
+  { en: "move",          ko: "이사하다",              exEn: "A new girl is moving in.",                                             exKo: "새로운 소녀가 이사 오고 있어." },
+  { en: "kid",           ko: "아이",                 exEn: "Katie was happy to see kids to play with.",                            exKo: "Katie는 같이 놀 아이들을 보고 기뻤다." },
+  { en: "porch",         ko: "현관",                 exEn: "Katie and her brother were on the porch.",                             exKo: "Katie와 그녀의 남동생은 현관에 있었다." },
+  { en: "walk",          ko: "걷다",                 exEn: "Ellen and Matt walked up to Katie's home.",                            exKo: "Ellen과 Matt는 Katie의 집으로 걸어갔다." },
+  { en: "use",           ko: "사용하다, 이용하다",     exEn: "They were using their hands to talk to each other.",                   exKo: "그들은 손을 이용해서 서로 이야기하고 있었다." },
+  { en: "talk",          ko: "이야기하다",             exEn: "But it was hard to tell what Katie was saying when she talked.",       exKo: "하지만 Katie가 말할 때 무엇을 말하고 있는지 알아 듣기 힘들었다." },
+  { en: "leave out",     ko: "배제하다",              exEn: "Katie felt sad to be left out.",                                       exKo: "Katie는 따돌림을 당해서 슬펐다." },
+  { en: "fair",          ko: "공평한",                exEn: "They knew they had not been fair to her.",                             exKo: "그들은 그들이 그녀에게 공평하지 못했다는 것을 알았다." },
+  { en: "deaf",          ko: "청각장애가 있는",        exEn: "Katie told them she was deaf.",                                        exKo: "Katie는 그녀에게 청각장애가 있다고 그들에게 말했다." },
+  { en: "sound",         ko: "소리",                 exEn: "She could hear very few sounds.",                                      exKo: "그녀는 매우 적은 수의 소리들을 들을 수 있었다." },
+  { en: "show",          ko: "보여주다",              exEn: "Katie showed Ellen and Matt how to say a few words with their hands.", exKo: "Katie는 Ellen과 Matt에게 손으로 몇몇 단어들을 어떻게 말하는지 보여 주었다." },
+  { en: "never",         ko: "결코 ~않다",            exEn: "Ellen and Matt had never seen anyone do that before.",                  exKo: "Ellen과 Matt는 전에 이러한 사람을 본 적이 없었다." },
+  { en: "before",        ko: "전에",                 exEn: "Ellen and Matt had never seen anyone do that before.",                  exKo: "Ellen과 Matt는 전에 이러한 사람을 본 적이 없었다." },
+  { en: "throw",         ko: "던지다",               exEn: "The boy threw the frisbee.",                                           exKo: "소년은 플라스틱 원반을 던졌다." },
+  { en: "sign language", ko: "수화",                 exEn: "She teaches sign language to her friends.",                            exKo: "그녀는 친구들에게 수화를 가르친다." },
+  { en: "few",           ko: "수가 적은, 약간의",     exEn: "She could hear very few sounds.",                                      exKo: "그녀는 매우 적은 수의 소리들을 들을 수 있었다." },
+  { en: "brother",       ko: "형, 오빠, 남동생",      exEn: "Ellen and Matt saw Katie playing with her brother.",                   exKo: "Ellen과 Matt는 Katie가 그녀의 남동생과 같이 노는 것을 보았다." },
+  { en: "like",          ko: "~와 같이",              exEn: "They saw that she was just like them.",                                exKo: "그들은 그녀가 그들과 같다는 것을 눈으로 보았다." },
+  { en: "hear",          ko: "듣다, 들리다",          exEn: "She could hear very few sounds.",                                      exKo: "그녀는 매우 적은 수의 소리들을 들을 수 있었다." },
+  { en: "neighborhood",  ko: "이웃",                 exEn: "Katie has moved into our neighborhood.",                               exKo: "Katie는 우리 이웃으로 이사 왔다." },
+  { en: "upset",         ko: "속상한",               exEn: "She was upset to lose the soccer game.",                               exKo: "그녀는 축구 경기에 져서 속상했다." },
+];
+
+let mode = 'en2ko';
+let queue = [];
+let current = 0;
+let score = 0;
+let answered = false;
+let results = [];
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.mode-btn').forEach((b, i) => {
+    b.classList.toggle('active', ['en2ko','ko2en','blank','mixed'][i] === m);
+  });
+  restart();
+}
+
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+function getWrongOptions(correct, field, count) {
+  return shuffle(VOCAB.filter(v => v[field] !== correct[field])).slice(0, count).map(v => v[field]);
+}
+
+function makeSentenceWithBlank(item) {
+  const escaped = item.en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`\\b${escaped}\\b`, 'i');
+  if (regex.test(item.exEn)) return item.exEn.replace(regex, '___BLANK___');
+  const idx = item.exEn.toLowerCase().indexOf(item.en.toLowerCase());
+  if (idx !== -1) return item.exEn.slice(0, idx) + '___BLANK___' + item.exEn.slice(idx + item.en.length);
+  return item.exEn + ' [___BLANK___]';
+}
+
+function buildQueue() {
+  return shuffle(VOCAB).map(item => {
+    let qMode = mode === 'mixed'
+      ? ['en2ko','ko2en','blank'][Math.floor(Math.random() * 3)]
+      : mode;
+
+    if (qMode === 'en2ko') return {
+      item, qMode,
+      qTypeLabel: 'EN → KO',
+      question: item.en,
+      hint: '이 단어의 한국어 뜻은?',
+      correctAnswer: item.ko,
+      options: shuffle([item.ko, ...getWrongOptions(item, 'ko', 3)]),
+      isSentence: false
+    };
+    if (qMode === 'ko2en') return {
+      item, qMode,
+      qTypeLabel: 'KO → EN',
+      question: item.ko,
+      hint: '이 뜻에 해당하는 영어 단어는?',
+      correctAnswer: item.en,
+      options: shuffle([item.en, ...getWrongOptions(item, 'en', 3)]),
+      isSentence: false
+    };
+    return {
+      item, qMode,
+      qTypeLabel: 'FILL IN THE BLANK',
+      question: '',
+      hint: '빈칸에 알맞은 단어를 고르세요.',
+      correctAnswer: item.en,
+      options: shuffle([item.en, ...getWrongOptions(item, 'en', 3)]),
+      isSentence: true,
+      sentenceWithBlank: makeSentenceWithBlank(item),
+      sentenceKo: item.exKo
+    };
+  });
+}
+
+function renderSentenceHtml(s, revealed, word) {
+  const parts = s.split('___BLANK___');
+  const b = revealed ? `<span class="blank revealed">${word}</span>` : `<span class="blank">?</span>`;
+  return parts[0] + b + (parts[1] || '');
+}
+
+function renderQuestion() {
+  const q = queue[current];
+  document.getElementById('q-type').textContent = q.qTypeLabel;
+  document.getElementById('q-hint').textContent = q.hint;
+
+  const qWordEl = document.getElementById('q-word');
+  const sentBox = document.getElementById('sentence-box');
+  if (q.isSentence) {
+    qWordEl.style.display = 'none';
+    sentBox.style.display = 'block';
+    document.getElementById('sentence-en').innerHTML = renderSentenceHtml(q.sentenceWithBlank, false, '');
+    document.getElementById('sentence-ko').textContent = q.sentenceKo;
+  } else {
+    qWordEl.style.display = 'block';
+    qWordEl.textContent = q.question;
+    sentBox.style.display = 'none';
+  }
+
+  const keys = ['①','②','③','④'];
+  const optDiv = document.getElementById('options');
+  optDiv.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="option-key">${keys[i]}</span>${opt}`;
+    btn.onclick = () => selectOption(btn, opt, q.correctAnswer, q);
+    optDiv.appendChild(btn);
+  });
+
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('next-btn').classList.remove('show');
+  answered = false;
+  updateProgress();
+}
+
+function selectOption(btn, selected, correct, q) {
+  if (answered) return;
+  answered = true;
+  document.querySelectorAll('.option').forEach(b => {
+    b.disabled = true;
+    if (b.textContent.replace(/[①②③④]/,'').trim() === correct) b.classList.add('correct');
+  });
+  if (q.isSentence) document.getElementById('sentence-en').innerHTML = renderSentenceHtml(q.sentenceWithBlank, true, correct);
+  const fb = document.getElementById('feedback');
+  if (selected === correct) {
+    btn.classList.add('correct');
+    fb.className = 'feedback correct show';
+    fb.textContent = '✓ 정답';
+    score++;
+    results.push({ item: q.item, qMode: q.qMode, ok: true });
+  } else {
+    btn.classList.add('wrong');
+    fb.className = 'feedback wrong show';
+    fb.textContent = `✗ 오답 — 정답: ${correct}`;
+    results.push({ item: q.item, qMode: q.qMode, ok: false });
+  }
+  document.getElementById('score-label').textContent = `정답 ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function next() {
+  current++;
+  if (current >= queue.length) showResult();
+  else renderQuestion();
+}
+
+function updateProgress() {
+  const pct = queue.length ? (current / queue.length * 100) : 0;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-label').textContent = `${current + 1} / ${queue.length}`;
+}
+
+function showResult() {
+  document.getElementById('quiz-card').style.display = 'none';
+  document.querySelector('.nav').style.display = 'none';
+  document.getElementById('result').classList.add('show');
+  const pct = Math.round(score / queue.length * 100);
+  document.getElementById('result-score').textContent = `${score} / ${queue.length}`;
+  document.getElementById('result-sub').textContent =
+    `정답률 ${pct}% — ${pct >= 80 ? '훌륭해요!' : pct >= 60 ? '조금 더 연습해봐요.' : '다시 한 번 도전!'}`;
+  const modeLabel = { en2ko: 'EN→KO', ko2en: 'KO→EN', blank: '빈칸' };
+  document.getElementById('breakdown').innerHTML = results.map(r => `
+    <div class="breakdown-row">
+      <span class="breakdown-word">${r.item.en} — ${r.item.ko}</span>
+      <span class="breakdown-type">${modeLabel[r.qMode] || ''}</span>
+      <span class="breakdown-status ${r.ok ? 'ok' : 'fail'}">${r.ok ? '✓' : '✗'}</span>
+    </div>
+  `).join('');
+  document.getElementById('prog-fill').style.width = '100%';
+  document.getElementById('prog-label').textContent = `${queue.length} / ${queue.length}`;
+}
+
+function restart() {
+  queue = buildQueue();
+  current = 0; score = 0; answered = false; results = [];
+  document.getElementById('score-label').textContent = '정답 0';
+  document.getElementById('quiz-card').style.display = 'block';
+  document.querySelector('.nav').style.display = 'flex';
+  document.getElementById('result').classList.remove('show');
+  renderQuestion();
+}
+
+function toggleJson() {
+  const c = document.getElementById('json-content');
+  const t = document.getElementById('json-toggle');
+  c.classList.toggle('open');
+  t.textContent = c.classList.contains('open') ? 'HIDE ▴' : 'SHOW ▾';
+}
+
+function copyJson() {
+  navigator.clipboard.writeText(JSON.stringify(VOCAB, null, 2)).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'COPIED ✓';
+    setTimeout(() => btn.textContent = 'COPY', 1500);
+  });
+}
+
+document.getElementById('json-content').textContent = JSON.stringify(VOCAB, null, 2);
+restart();
+</script>
+</body>
+</html>
