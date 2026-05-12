@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CLIP 7A — Unit 5 & 6 Vocabulary</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f; --surface: #1a1a1a; --surface2: #1e2235;
+    --border: #2e2e2e; --accent: #c8f564; --accent2: #64c8f5;
+    --accent3: #f5a623; --accent4: #e88fc7;
+    --text: #e8e8e8; --muted: #666;
+    --correct: #4ade80; --wrong: #f87171;
+    --form-bg: rgba(100,200,245,0.08); --form-border: rgba(100,200,245,0.3);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace;
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    padding: 2rem 1rem 4rem; }
+  header { width: 100%; max-width: 760px; margin-bottom: 1.8rem; }
+  .label { font-size: 0.6rem; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; margin-bottom: 0.4rem; }
+  h1 { font-size: 1.4rem; font-weight: 500; color: var(--accent); letter-spacing: -0.02em; }
+  .subtitle { font-size: 0.7rem; color: var(--muted); margin-top: 0.3rem; }
+
+  /* Unit selector */
+  .unit-tabs { width: 100%; max-width: 760px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.4rem; margin-bottom: 1rem; }
+  .unit-tab {
+    padding: 0.55rem 0.5rem; border: 1px solid var(--border); background: var(--surface);
+    color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.65rem;
+    letter-spacing: 0.04em; cursor: pointer; text-align: center; transition: all 0.15s; line-height: 1.4;
+  }
+  .unit-tab.active-u5 { border-color: var(--accent); color: var(--accent); background: rgba(200,245,100,0.06); }
+  .unit-tab.active-u6 { border-color: var(--accent2); color: var(--accent2); background: rgba(100,200,245,0.06); }
+  .unit-tab.active-both { border-color: var(--accent4); color: var(--accent4); background: rgba(232,143,199,0.06); }
+  .unit-tab:hover:not([class*="active"]) { border-color: #444; color: var(--text); }
+
+  /* Mode selector */
+  .mode-tabs { width: 100%; max-width: 760px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.4rem; margin-bottom: 1.5rem; }
+  .mode-tab {
+    padding: 0.55rem 0.5rem; border: 1px solid var(--border); background: var(--surface);
+    color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.63rem;
+    letter-spacing: 0.04em; cursor: pointer; text-align: center; transition: all 0.15s; line-height: 1.5;
+  }
+  .mode-tab.active-en2ko { border-color: var(--accent3); color: var(--accent3); background: rgba(245,166,35,0.06); }
+  .mode-tab.active-ko2en { border-color: var(--accent); color: var(--accent); background: rgba(200,245,100,0.06); }
+  .mode-tab.active-blank { border-color: var(--accent2); color: var(--accent2); background: rgba(100,200,245,0.06); }
+  .mode-tab:hover:not([class*="active"]) { border-color: #444; color: var(--text); }
+
+  .progress-bar-wrap { width: 100%; max-width: 760px; margin-bottom: 1.8rem; }
+  .progress-meta { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--muted); margin-bottom: 0.4rem; }
+  .progress-bar { height: 2px; background: var(--border); }
+  .progress-fill { height: 100%; transition: width 0.4s ease; }
+  .fill-en2ko { background: var(--accent3); }
+  .fill-ko2en { background: var(--accent); }
+  .fill-blank  { background: var(--accent2); }
+
+  .card { width: 100%; max-width: 760px; background: var(--surface); border: 1px solid var(--border);
+    padding: 2rem 2rem 1.8rem; margin-bottom: 1.2rem; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+  .q-unit-tag { font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.3rem; }
+  .q-unit-tag.u5 { color: var(--accent); } .q-unit-tag.u6 { color: var(--accent2); }
+  .q-type { font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.8rem; }
+  .q-type.en2ko { color: var(--accent3); } .q-type.ko2en { color: var(--accent); } .q-type.blank { color: var(--accent2); }
+  .q-num { font-size: 0.65rem; color: var(--muted); margin-bottom: 0.6rem; }
+  .q-word { font-family: 'Gowun Dodum', sans-serif; font-size: 1.9rem; font-weight: 500; color: var(--text);
+    margin-bottom: 0.3rem; line-height: 1.3; }
+  .q-hint { font-size: 0.7rem; color: var(--muted); margin-bottom: 1.6rem; }
+
+  /* Sentence blank */
+  .sentence-box { margin-bottom: 1.6rem; }
+  .sentence-en { font-family: 'Gowun Dodum', sans-serif; font-size: 1.05rem; color: var(--text);
+    line-height: 1.9; margin-bottom: 0.6rem; }
+  .blank { display: inline-block; border-bottom: 2px solid var(--accent2); min-width: 80px;
+    color: var(--accent2); font-weight: 500; padding: 0 4px; text-align: center; }
+  .blank.revealed { color: var(--correct); border-color: var(--correct); }
+  .sentence-ko { font-family: 'Gowun Dodum', sans-serif; font-size: 0.85rem; color: var(--muted);
+    line-height: 1.7; padding-left: 0.6rem; border-left: 2px solid var(--border); }
+
+  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; }
+  .option { padding: 0.75rem 1rem; border: 1px solid var(--border); background: transparent;
+    color: var(--text); font-family: 'Gowun Dodum', sans-serif; font-size: 0.88rem;
+    text-align: left; cursor: pointer; transition: all 0.12s;
+    display: flex; align-items: flex-start; gap: 0.6rem; line-height: 1.5; }
+  .option:hover:not(:disabled) { border-color: var(--accent); background: rgba(200,245,100,0.04); }
+  .option.correct { border-color: var(--correct); background: rgba(74,222,128,0.08); color: var(--correct); }
+  .option.wrong   { border-color: var(--wrong);   background: rgba(248,113,113,0.08); color: var(--wrong); }
+  .option-key { font-size: 0.6rem; color: var(--muted); font-family: 'DM Mono', monospace;
+    min-width: 1rem; flex-shrink: 0; padding-top: 3px; }
+  .option.correct .option-key { color: var(--correct); }
+  .option.wrong   .option-key { color: var(--wrong); }
+
+  .feedback { margin-top: 1rem; padding: 0.75rem 1rem; font-size: 0.78rem; border-left: 2px solid transparent;
+    display: none; font-family: 'Gowun Dodum', sans-serif; line-height: 1.6; }
+  .feedback.show { display: block; }
+  .feedback.correct { border-color: var(--correct); color: var(--correct); }
+  .feedback.wrong   { border-color: var(--wrong);   color: var(--wrong); }
+
+  .nav { width: 100%; max-width: 760px; display: flex; justify-content: flex-end; margin-bottom: 2rem; }
+  .next-btn { padding: 0.65rem 1.5rem; color: #0f0f0f; border: none;
+    font-family: 'DM Mono', monospace; font-size: 0.78rem; font-weight: 500;
+    letter-spacing: 0.05em; cursor: pointer; display: none; transition: opacity 0.15s; }
+  .next-btn:hover { opacity: 0.85; } .next-btn.show { display: block; }
+  .next-btn.en2ko { background: var(--accent3); }
+  .next-btn.ko2en { background: var(--accent); }
+  .next-btn.blank { background: var(--accent2); }
+
+  .result { width: 100%; max-width: 760px; display: none; flex-direction: column; gap: 1.5rem; animation: fadeIn 0.3s ease; }
+  .result.show { display: flex; }
+  .result-score { font-size: 3.8rem; font-weight: 500; letter-spacing: -0.04em; line-height: 1; }
+  .score-en2ko { color: var(--accent3); } .score-ko2en { color: var(--accent); } .score-blank { color: var(--accent2); }
+  .result-sub { font-size: 0.78rem; color: var(--muted); margin-top: 0.3rem; }
+  .result-breakdown { border: 1px solid var(--border); background: var(--surface); max-height: 420px; overflow-y: auto; }
+  .breakdown-row { display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 0.65rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.73rem; gap: 1rem; }
+  .breakdown-row:last-child { border-bottom: none; }
+  .breakdown-q { font-family: 'Gowun Dodum', sans-serif; flex: 1; line-height: 1.5; }
+  .breakdown-unit { font-size: 0.58rem; letter-spacing: 0.1em; white-space: nowrap; padding-top: 2px; }
+  .breakdown-unit.u5 { color: var(--accent); } .breakdown-unit.u6 { color: var(--accent2); }
+  .breakdown-status { font-size: 0.7rem; white-space: nowrap; padding-top: 2px; }
+  .ok { color: var(--correct); } .fail { color: var(--wrong); }
+  .result-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+  .ra-btn { padding: 0.65rem 1.3rem; background: transparent; border: 1px solid var(--border);
+    color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.75rem; cursor: pointer; transition: all 0.15s; }
+  .ra-btn:hover { color: var(--text); border-color: #555; }
+  .ra-btn.p { border-color: var(--accent2); color: var(--accent2); }
+  .ra-btn.p:hover { background: var(--accent2); color: #0f0f0f; }
+
+  .json-block { width: 100%; max-width: 760px; margin-top: 2.5rem; border: 1px solid var(--border); background: var(--surface); }
+  .json-header { display: flex; justify-content: space-between; align-items: center; padding: 0.55rem 1rem; border-bottom: 1px solid var(--border); cursor: pointer; }
+  .json-header span { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.12em; }
+  .json-toggle { font-size: 0.62rem; color: var(--accent2); letter-spacing: 0.1em; }
+  .json-content { display: none; padding: 1rem; font-size: 0.68rem; color: #888; white-space: pre-wrap; word-break: break-all; max-height: 300px; overflow-y: auto; line-height: 1.6; }
+  .json-content.open { display: block; }
+  .copy-btn { padding: 0.35rem 0.7rem; background: transparent; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.62rem; cursor: pointer; }
+  .copy-btn:hover { color: var(--text); border-color: #444; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="label">CLIP 7A · Reading & Vocabulary</div>
+  <h1>Unit 5 & 6 Vocabulary Quiz</h1>
+  <div class="subtitle">Unit 5: Internet Use (20 words) · Unit 6: Kidney Beans Life Cycle (20 words)</div>
+</header>
+
+<!-- Unit selector -->
+<div class="unit-tabs">
+  <button class="unit-tab active-u5" onclick="switchUnit('u5')">Unit 5<br><span style="font-size:0.58rem;opacity:0.7">인터넷 (20단어)</span></button>
+  <button class="unit-tab" onclick="switchUnit('u6')">Unit 6<br><span style="font-size:0.58rem;opacity:0.7">강낭콩 (20단어)</span></button>
+  <button class="unit-tab" onclick="switchUnit('both')">Unit 5+6<br><span style="font-size:0.58rem;opacity:0.7">통합 (40단어)</span></button>
+</div>
+
+<!-- Mode selector -->
+<div class="mode-tabs">
+  <button class="mode-tab active-en2ko" onclick="switchMode('en2ko')">① 영어 → 한국어<br><span style="font-size:0.58rem;opacity:0.7">4지선다</span></button>
+  <button class="mode-tab" onclick="switchMode('ko2en')">② 한국어 → 영어<br><span style="font-size:0.58rem;opacity:0.7">4지선다</span></button>
+  <button class="mode-tab" onclick="switchMode('blank')">③ 예문 빈칸<br><span style="font-size:0.58rem;opacity:0.7">4지선다</span></button>
+</div>
+
+<div class="progress-bar-wrap">
+  <div class="progress-meta"><span id="prog-label">0 / 0</span><span id="score-label">정답 0</span></div>
+  <div class="progress-bar"><div class="progress-fill fill-en2ko" id="prog-fill" style="width:0%"></div></div>
+</div>
+
+<div class="card" id="quiz-card">
+  <div class="q-unit-tag u5" id="q-unit-tag">UNIT 5</div>
+  <div class="q-type en2ko" id="q-type">EN → KO</div>
+  <div class="q-num" id="q-num"></div>
+  <div class="q-word" id="q-word"></div>
+  <div class="q-hint" id="q-hint"></div>
+  <div class="sentence-box" id="sentence-box" style="display:none">
+    <div class="sentence-en" id="sentence-en"></div>
+    <div class="sentence-ko" id="sentence-ko"></div>
+  </div>
+  <div class="options" id="options"></div>
+  <div class="feedback" id="feedback"></div>
+</div>
+
+<div class="nav"><button class="next-btn en2ko" id="next-btn" onclick="next()">다음 →</button></div>
+
+<div class="result" id="result">
+  <div>
+    <div class="result-score score-en2ko" id="result-score"></div>
+    <div class="result-sub" id="result-sub"></div>
+  </div>
+  <div class="result-breakdown" id="breakdown"></div>
+  <div class="result-actions" id="result-actions"></div>
+</div>
+
+<div class="json-block">
+  <div class="json-header" onclick="toggleJson()">
+    <span>RAW JSON DATA</span>
+    <div style="display:flex;gap:0.5rem;align-items:center">
+      <button class="copy-btn" onclick="event.stopPropagation();copyJson()">COPY</button>
+      <span class="json-toggle" id="json-toggle">SHOW ▾</span>
+    </div>
+  </div>
+  <div class="json-content" id="json-content"></div>
+</div>
+
+<script>
+// ── VOCAB DATA ────────────────────────────────────────────────────────────────
+const VOCAB = {
+  u5: [
+    { en: "popular",      ko: "인기 있는",
+      exEn: "Blogging used to be a popular way for teenagers and young adults to share their ideas.",
+      exKo: "블로그 활동은 청소년과 젊은 성인층이 생각을 교환할 수 있는 인기 있는 방법이었습니다." },
+    { en: "bully",        ko: "괴롭히다",
+      exEn: "\"Cyber-bullying\" is the use of the Internet to bully and hurt peers.",
+      exKo: "사이버 불링은 동료들을 괴롭히고 상처 주기 위해 인터넷을 사용하는 것입니다." },
+    { en: "young adult",  ko: "젊은 성인",
+      exEn: "Blogging used to be a popular way for teenagers and young adults to share their ideas.",
+      exKo: "블로그 활동은 청소년과 젊은 성인들이 생각을 교환할 수 있는 인기 있는 방법이었습니다." },
+    { en: "prefer",       ko: "선호하다",
+      blankWord: "preferred",
+    exEn: "Using social media to send shorter messages has become preferred.",
+      exKo: "더 짧은 메시지를 보내기 위해 소셜 미디어를 사용하는 것이 선호되어 왔습니다." },
+    { en: "carefully",    ko: "조심스럽게, 신중하게",
+      exEn: "The Internet should always be used carefully.",
+      exKo: "인터넷은 항상 조심스럽게 사용되어야 합니다." },
+    { en: "curriculum",   ko: "교육 과정",
+      exEn: "Some teachers believe that safe Internet use should be taught as part of the school curriculum.",
+      exKo: "일부 교사들은 안전한 인터넷 사용이 학교 교육 과정의 일부로 가르쳐져야 한다고 믿습니다." },
+    { en: "media",        ko: "미디어, 매체",
+      exEn: "Social media sites such as Facebook, Twitter, and Instagram let users send and receive short messages.",
+      exKo: "페이스북, 트위터, 인스타그램 같은 소셜 미디어 사이트는 사용자들이 짧은 메시지를 보내고 받을 수 있게 합니다." },
+    { en: "hurt",         ko: "상처 주다, 해치다",
+      exEn: "Social media sites and games may be used to hurt others.",
+      exKo: "소셜 미디어 사이트와 게임은 다른 사람들을 상처 주기 위해 사용될 수 있습니다." },
+    { en: "cyber",        ko: "사이버, 인터넷의",
+      exEn: "\"Cyber-bullying\" is the use of the Internet to bully and hurt peers.",
+      exKo: "\"사이버 불링\"은 동료들을 괴롭히고 상처 주기 위해 인터넷을 사용하는 것입니다." },
+    { en: "useful",       ko: "유용한",
+      exEn: "Even though it is useful for many things, the Internet should always be used carefully.",
+      exKo: "비록 많은 것들에 유용하지만, 인터넷은 항상 조심스럽게 사용되어야 합니다." },
+    { en: "such as",      ko: "예를 들어, ~와 같은",
+      exEn: "Social media sites such as Facebook, Twitter, and Instagram let users send and receive short messages.",
+      exKo: "페이스북, 트위터, 인스타그램과 같은 소셜 미디어 사이트는 사용자들이 짧은 메시지를 보내고 받을 수 있게 합니다." },
+    { en: "connect",      ko: "연결하다",
+      exEn: "Game players can connect with each other and communicate in the game.",
+      exKo: "게임을 하는 사람들은 서로 연결하고 게임 안에서 소통할 수 있습니다." },
+    { en: "receive",      ko: "받다",
+      exEn: "Social media sites let users send and receive short messages.",
+      exKo: "소셜 미디어 사이트는 사용자들이 짧은 메시지를 보내고 받을 수 있게 합니다." },
+    { en: "artwork",      ko: "예술 작품",
+      exEn: "Users can also share photographs, artwork, interesting stories and ideas.",
+      exKo: "사용자들은 또한 사진, 예술 작품, 흥미로운 이야기와 의견을 공유할 수 있습니다." },
+    { en: "communicate",  ko: "의사소통하다",
+      exEn: "Game players can connect with each other and communicate in the game.",
+      exKo: "게임을 하는 사람들은 서로 연결하고 게임 안에서 의사소통할 수 있습니다." },
+    { en: "peer",         ko: "또래, 동료, 친구",
+      exEn: "\"Cyber-bullying\" is the use of the Internet to bully and hurt peers.",
+      exKo: "\"사이버 불링\"은 동료들을 괴롭히고 상처 주기 위해 인터넷을 사용하는 것입니다." },
+    { en: "increase",     ko: "증가하다",
+      blankWord: "increased",
+    exEn: "\"Cyber-bullying\" has increased.",
+      exKo: "\"사이버 불링\"이 증가했습니다." },
+    { en: "social",       ko: "사회의, 사회적인",
+      exEn: "Social media sites such as Facebook, Twitter, and Instagram let users send and receive short messages.",
+      exKo: "소셜 미디어 사이트는 사용자들이 짧은 메시지를 보내고 받을 수 있게 합니다." },
+    { en: "teenager",     ko: "청소년",
+      exEn: "Communication is one of the most common uses for the Internet among teenagers.",
+      exKo: "의사소통은 청소년들 사이에서 인터넷의 가장 일반적인 용도 중 하나입니다." },
+    { en: "share",        ko: "공유하다",
+      exEn: "Users can also share photographs, artwork, interesting stories and ideas.",
+      exKo: "사용자들은 또한 사진, 예술 작품, 흥미로운 이야기와 의견을 공유할 수 있습니다." },
+  ],
+  u6: [
+    { en: "form",         ko: "(모양을) 형성하다",
+      exEn: "The fertilized egg will form a new pod in the shape of a long green bean.",
+      exKo: "수정된 난자는 긴 녹색 콩 모양의 새로운 꼬투리를 형성할 것입니다." },
+    { en: "pollinate",    ko: "수분시키다",
+      blankWord: "pollinated",
+    exEn: "After the plants are fully grown, they must be pollinated.",
+      exKo: "식물들이 완전히 자란 후, 그것들은 수분되어야 합니다." },
+    { en: "land",         ko: "(특정 위치에) 닿다, 착지하다",
+      blankWord: "lands",
+    exEn: "Usually this happens when pollen lands on a tube-like stigma.",
+      exKo: "보통 이것은 꽃가루가 관 모양의 암술머리에 닿을 때 일어납니다." },
+    { en: "delicate",     ko: "약한, 섬세한",
+      exEn: "At first the pod is very delicate, but later the beans will get bigger.",
+      exKo: "처음에는 꼬투리가 매우 약하지만, 나중에는 콩들이 점점 커질 것입니다." },
+    { en: "several",      ko: "몇 개의, 여러",
+      blankWord: "reproducing",
+    exEn: "Like other plants, their lives have several stages, including sprouting, pollinating, and reproducing.",
+      exKo: "다른 식물들처럼, 그들의 삶은 발아, 수분, 번식을 포함한 여러 단계를 가지고 있습니다." },
+    { en: "tube",         ko: "관, 통",
+      blankWord: "travels",
+    blankWord: "fertilizes",
+    exEn: "The pollen travels through the tube and fertilizes an egg.",
+      exKo: "꽃가루는 관을 통해 이동하고 난자를 수정시킵니다." },
+    { en: "sprout",       ko: "싹이 트다, 싹",
+      exEn: "Kidney beans usually sprout two or three days after planting.",
+      exKo: "강낭콩은 보통 심은 후 2~3일 후에 싹이 틉니다." },
+    { en: "stigma",       ko: "암술머리",
+      exEn: "Usually this happens when pollen lands on a tube-like stigma.",
+      exKo: "보통 이것은 꽃가루가 관 모양의 암술머리에 닿을 때 일어납니다." },
+    { en: "cycle",        ko: "순환, 주기",
+      exEn: "Kidney beans finish this life cycle every year.",
+      exKo: "강낭콩은 매년 이 생애 주기를 마칩니다." },
+    { en: "soil",         ko: "흙, 토양",
+      exEn: "Kidney beans need moist, warm soil, so they can grow.",
+      exKo: "강낭콩은 자랄 수 있도록 촉촉하고 따뜻한 흙이 필요합니다." },
+    { en: "pollen",       ko: "꽃가루",
+      exEn: "Usually this happens when pollen lands on a tube-like stigma.",
+      exKo: "보통 이것은 꽃가루가 관 모양의 암술머리에 닿을 때 일어납니다." },
+    { en: "plant",        ko: "(식물을) 심다 / 식물",
+      exEn: "Kidney beans are a seed, and you can plant them easily.",
+      exKo: "강낭콩은 씨앗이며, 쉽게 심을 수 있습니다." },
+    { en: "travel",       ko: "이동하다",
+      exEn: "The pollen travels through the tube and fertilizes an egg.",
+      exKo: "꽃가루는 관을 통해 이동하고 난자를 수정시킵니다." },
+    { en: "moist",        ko: "촉촉한",
+      exEn: "Kidney beans need moist, warm soil, so they can grow.",
+      exKo: "강낭콩은 자랄 수 있도록 촉촉하고 따뜻한 흙이 필요합니다." },
+    { en: "reproduce",    ko: "번식하다",
+      exEn: "Like other plants, their lives have several stages, including sprouting, pollinating, and reproducing.",
+      exKo: "다른 식물들처럼, 그들의 삶은 발아, 수분, 번식하는 것을 포함한 여러 단계를 가지고 있습니다." },
+    { en: "fertilize",    ko: "수정시키다",
+      exEn: "The pollen travels through the tube and fertilizes an egg.",
+      exKo: "꽃가루는 관을 통해 이동하고 난자를 수정시킵니다." },
+    { en: "egg",          ko: "난자",
+      exEn: "The pollen travels through the tube and fertilizes an egg.",
+      exKo: "꽃가루는 관을 통해 이동하고 난자를 수정시킵니다." },
+    { en: "seed",         ko: "씨앗",
+      exEn: "Kidney beans are a seed, and you can plant them easily.",
+      exKo: "강낭콩은 씨앗이며, 쉽게 심을 수 있습니다." },
+    { en: "kidney bean",  ko: "강낭콩",
+      exEn: "Many people enjoy eating kidney beans with their meal.",
+      exKo: "많은 사람들이 식사를 할 때 강낭콩을 함께 먹는 것을 좋아합니다." },
+    { en: "pod",          ko: "(콩 등의) 꼬투리",
+      exEn: "The fertilized egg will form a new pod in the shape of a long green bean.",
+      exKo: "수정된 난자는 긴 녹색 콩 모양의 새로운 꼬투리를 형성할 것입니다." },
+  ]
+};
+
+// ── state ─────────────────────────────────────────────────────────────────────
+let unit = 'u5', mode = 'en2ko';
+let pool = [], queue = [], current = 0, score = 0, answered = false, results = [];
+
+// ── helpers ───────────────────────────────────────────────────────────────────
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+function getPool() {
+  if (unit === 'u5')   return VOCAB.u5.map(v => ({ ...v, unit: 'u5' }));
+  if (unit === 'u6')   return VOCAB.u6.map(v => ({ ...v, unit: 'u6' }));
+  return [...VOCAB.u5.map(v => ({ ...v, unit: 'u5' })),
+          ...VOCAB.u6.map(v => ({ ...v, unit: 'u6' }))];
+}
+
+function getWrong(correct, field, count) {
+  return shuffle(pool.filter(v => v[field] !== correct[field])).slice(0, count).map(v => v[field]);
+}
+
+function makeSentenceWithBlank(item) {
+  if (item.customBlank) return item.customBlank.replace(/<BLANK>/g, '___BLANK___');
+  const word = item.blankWord || item.en;
+  const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`\\b${escaped}\\b`, 'i');
+  if (regex.test(item.exEn)) return item.exEn.replace(regex, '___BLANK___');
+  const idx = item.exEn.toLowerCase().indexOf(word.toLowerCase());
+  if (idx !== -1) return item.exEn.slice(0, idx) + '___BLANK___' + item.exEn.slice(idx + word.length);
+  return item.exEn + ' [___BLANK___]';
+}
+
+function renderBlank(s, revealed, word) {
+  const b = revealed ? `<span class="blank revealed">${word}</span>` : `<span class="blank">?</span>`;
+  return s.split('___BLANK___').join(b);
+}
+
+// ── build queue ───────────────────────────────────────────────────────────────
+function buildQueue() {
+  pool = getPool();
+  return shuffle(pool).map(item => {
+    if (mode === 'en2ko') return {
+      item, mode, isSentence: false,
+      qTypeLabel: 'EN → KO', question: item.en, hint: '이 단어의 한국어 뜻은?',
+      correct: item.ko, options: shuffle([item.ko, ...getWrong(item, 'ko', 3)]),
+    };
+    if (mode === 'ko2en') return {
+      item, mode, isSentence: false,
+      qTypeLabel: 'KO → EN', question: item.ko, hint: '이 뜻에 해당하는 영어 단어는?',
+      correct: item.en, options: shuffle([item.en, ...getWrong(item, 'en', 3)]),
+    };
+    // blank
+    const blankCorrect = item.customAnswer || item.blankWord || item.en;
+    return {
+      item, mode, isSentence: true,
+      qTypeLabel: 'FILL IN THE BLANK',
+      correct: blankCorrect,
+      options: shuffle([blankCorrect, ...getWrong(item, 'en', 3)]),
+      sentenceWithBlank: makeSentenceWithBlank(item),
+      sentenceKo: item.exKo,
+    };
+  });
+}
+
+// ── render ────────────────────────────────────────────────────────────────────
+function renderQuestion() {
+  const q = queue[current];
+
+  const unitTag = document.getElementById('q-unit-tag');
+  unitTag.textContent = q.item.unit === 'u5' ? 'UNIT 5' : 'UNIT 6';
+  unitTag.className = `q-unit-tag ${q.item.unit}`;
+
+  const qtEl = document.getElementById('q-type');
+  qtEl.textContent = q.qTypeLabel;
+  qtEl.className = `q-type ${q.mode}`;
+
+  document.getElementById('q-num').textContent = `문제 ${current + 1} / ${queue.length}`;
+
+  const qWordEl = document.getElementById('q-word');
+  const qHintEl = document.getElementById('q-hint');
+  const sentBox = document.getElementById('sentence-box');
+
+  if (q.isSentence) {
+    qWordEl.style.display = 'none'; qHintEl.style.display = 'none';
+    sentBox.style.display = 'block';
+    document.getElementById('sentence-en').innerHTML = renderBlank(q.sentenceWithBlank, false, '');
+    document.getElementById('sentence-ko').textContent = q.sentenceKo;
+  } else {
+    qWordEl.style.display = 'block'; qHintEl.style.display = 'block';
+    sentBox.style.display = 'none';
+    qWordEl.textContent = q.question; qHintEl.textContent = q.hint;
+  }
+
+  const keys = ['①','②','③','④'];
+  const optDiv = document.getElementById('options');
+  optDiv.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="option-key">${keys[i]}</span>${opt}`;
+    btn.onclick = () => selectMC(btn, opt, q);
+    optDiv.appendChild(btn);
+  });
+
+  document.getElementById('feedback').className = 'feedback';
+  const nb = document.getElementById('next-btn');
+  nb.classList.remove('show'); nb.className = `next-btn ${q.mode}`;
+  answered = false; updateProgress();
+}
+
+function selectMC(btn, selected, q) {
+  if (answered) return;
+  answered = true;
+  document.querySelectorAll('.option').forEach(b => {
+    b.disabled = true;
+    if (b.textContent.replace(/[①②③④]/,'').trim() === q.correct) b.classList.add('correct');
+  });
+  if (q.isSentence) {
+    document.getElementById('sentence-en').innerHTML = renderBlank(q.sentenceWithBlank, true, q.correct);
+  }
+  const fb = document.getElementById('feedback');
+  if (selected === q.correct) {
+    btn.classList.add('correct'); fb.className = 'feedback correct show'; fb.textContent = '✓ 정답';
+    score++; results.push({ item: q.item, ok: true });
+  } else {
+    btn.classList.add('wrong'); fb.className = 'feedback wrong show';
+    fb.textContent = `✗ 오답 — 정답: ${q.correct}`;
+    results.push({ item: q.item, ok: false });
+  }
+  document.getElementById('score-label').textContent = `정답 ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function next() {
+  current++;
+  if (current >= queue.length) showResult();
+  else renderQuestion();
+}
+
+function updateProgress() {
+  const pct = queue.length ? (current / queue.length * 100) : 0;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-fill').className = `progress-fill fill-${mode}`;
+  document.getElementById('prog-label').textContent = `${current + 1} / ${queue.length}`;
+}
+
+function showResult() {
+  document.getElementById('quiz-card').style.display = 'none';
+  document.querySelector('.nav').style.display = 'none';
+  document.getElementById('result').classList.add('show');
+  document.getElementById('prog-fill').style.width = '100%';
+  document.getElementById('prog-label').textContent = `${queue.length} / ${queue.length}`;
+
+  const pct = Math.round(score / queue.length * 100);
+  const scoreEl = document.getElementById('result-score');
+  scoreEl.textContent = `${score} / ${queue.length}`;
+  scoreEl.className = `result-score score-${mode}`;
+  document.getElementById('result-sub').textContent =
+    `정답률 ${pct}% — ${pct >= 80 ? '훌륭해요!' : pct >= 60 ? '조금 더 연습해봐요.' : '다시 한 번 도전!'}`;
+
+  document.getElementById('breakdown').innerHTML = results.map(r => `
+    <div class="breakdown-row">
+      <div class="breakdown-q">${r.item.en} — ${r.item.ko}</div>
+      <span class="breakdown-unit ${r.item.unit}">${r.item.unit.toUpperCase()}</span>
+      <span class="breakdown-status ${r.ok ? 'ok' : 'fail'}">${r.ok ? '✓' : '✗'}</span>
+    </div>
+  `).join('');
+
+  const otherModes = ['en2ko','ko2en','blank'].filter(m => m !== mode);
+  const modeLabels = { en2ko: '① 영어→한국어', ko2en: '② 한국어→영어', blank: '③ 예문 빈칸' };
+  document.getElementById('result-actions').innerHTML =
+    `<button class="ra-btn p" onclick="startQuiz()">다시 풀기</button>` +
+    otherModes.map(m => `<button class="ra-btn" onclick="switchMode('${m}')">${modeLabels[m]}</button>`).join('');
+}
+
+// ── switching ─────────────────────────────────────────────────────────────────
+function switchUnit(u) {
+  unit = u;
+  document.querySelectorAll('.unit-tab').forEach((b, i) => {
+    const us = ['u5','u6','both'];
+    b.className = `unit-tab${u === us[i] ? ' active-' + us[i] : ''}`;
+  });
+  startQuiz();
+}
+
+function switchMode(m) {
+  mode = m;
+  document.querySelectorAll('.mode-tab').forEach((b, i) => {
+    const ms = ['en2ko','ko2en','blank'];
+    b.className = `mode-tab${m === ms[i] ? ' active-' + ms[i] : ''}`;
+  });
+  startQuiz();
+}
+
+function startQuiz() {
+  queue = buildQueue();
+  current = 0; score = 0; answered = false; results = [];
+  document.getElementById('score-label').textContent = '정답 0';
+  document.getElementById('quiz-card').style.display = 'block';
+  document.querySelector('.nav').style.display = 'flex';
+  document.getElementById('result').classList.remove('show');
+  renderQuestion();
+}
+
+function toggleJson() {
+  const c = document.getElementById('json-content');
+  const t = document.getElementById('json-toggle');
+  c.classList.toggle('open');
+  t.textContent = c.classList.contains('open') ? 'HIDE ▴' : 'SHOW ▾';
+}
+function copyJson() {
+  navigator.clipboard.writeText(JSON.stringify(VOCAB, null, 2)).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'COPIED ✓';
+    setTimeout(() => btn.textContent = 'COPY', 1500);
+  });
+}
+
+document.getElementById('json-content').textContent = JSON.stringify(VOCAB, null, 2);
+startQuiz();
+</script>
+</body>
+</html>
