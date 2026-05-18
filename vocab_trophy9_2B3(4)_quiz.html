@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trophy 9 2B Unit 3-4 — I'm a Volunteer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f; --surface: #1a1a1a; --border: #2e2e2e;
+    --accent: #c8f564; --accent2: #64c8f5; --accent3: #f5a623;
+    --text: #e8e8e8; --muted: #666; --correct: #4ade80; --wrong: #f87171;
+    --form-bg: rgba(100,200,245,0.08); --form-border: rgba(100,200,245,0.3);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace;
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    padding: 2rem 1rem 4rem; }
+  header { width: 100%; max-width: 740px; margin-bottom: 2rem; }
+  .label { font-size: 0.62rem; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; margin-bottom: 0.4rem; }
+  h1 { font-size: 1.5rem; font-weight: 500; color: var(--accent); letter-spacing: -0.02em; }
+  .subtitle { font-size: 0.72rem; color: var(--muted); margin-top: 0.3rem; }
+
+  .section-tabs { width: 100%; max-width: 740px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.4rem; margin-bottom: 1.5rem; }
+  .section-tab { padding: 0.65rem 0.5rem; border: 1px solid var(--border); background: var(--surface);
+    color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.63rem;
+    letter-spacing: 0.04em; cursor: pointer; text-align: center; transition: all 0.15s; line-height: 1.6; }
+  .section-tab.active-en2ko { border-color: var(--accent);  color: var(--accent);  background: rgba(200,245,100,0.06); }
+  .section-tab.active-ko2en { border-color: var(--accent3); color: var(--accent3); background: rgba(245,166,35,0.06); }
+  .section-tab.active-blank { border-color: var(--accent2); color: var(--accent2); background: rgba(100,200,245,0.06); }
+  .section-tab:hover:not([class*="active"]) { border-color: #444; color: var(--text); }
+
+  .progress-bar-wrap { width: 100%; max-width: 740px; margin-bottom: 2rem; }
+  .progress-meta { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--muted); margin-bottom: 0.4rem; }
+  .progress-bar { height: 2px; background: var(--border); }
+  .progress-fill { height: 100%; transition: width 0.4s ease; }
+  .fill-en2ko { background: var(--accent); }
+  .fill-ko2en { background: var(--accent3); }
+  .fill-blank  { background: var(--accent2); }
+
+  .card { width: 100%; max-width: 740px; background: var(--surface); border: 1px solid var(--border);
+    padding: 2.2rem 2rem 1.8rem; margin-bottom: 1.2rem; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+  .q-type { font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 0.7rem; }
+  .q-type.en2ko { color: var(--accent); } .q-type.ko2en { color: var(--accent3); } .q-type.blank { color: var(--accent2); }
+  .q-num { font-size: 0.65rem; color: var(--muted); margin-bottom: 0.6rem; }
+  .q-word { font-family: 'Gowun Dodum', sans-serif; font-size: 1.9rem; font-weight: 500; color: var(--text); margin-bottom: 0.3rem; line-height: 1.3; }
+  .q-hint { font-size: 0.7rem; color: var(--muted); margin-bottom: 1.6rem; }
+
+  .forms-tag { display: none; margin-bottom: 1.4rem; padding: 0.55rem 0.9rem;
+    background: var(--form-bg); border: 1px solid var(--form-border);
+    font-size: 0.72rem; color: var(--accent2); line-height: 1.8; font-family: 'DM Mono', monospace; }
+  .forms-tag.show { display: block; }
+  .forms-label { color: var(--muted); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; margin-right: 0.4rem; }
+  .forms-irreg { color: #ffb347; }
+
+  .sentence-box { margin-bottom: 1.6rem; }
+  .sentence-en { font-family: 'Gowun Dodum', sans-serif; font-size: 1.05rem; color: var(--text); line-height: 1.9; margin-bottom: 0.6rem; }
+  .blank { display: inline-block; border-bottom: 2px solid var(--accent2); min-width: 70px; color: var(--accent2); font-weight: 500; padding: 0 4px; text-align: center; }
+  .blank.revealed { color: var(--correct); border-color: var(--correct); }
+  .sentence-ko { font-family: 'Gowun Dodum', sans-serif; font-size: 0.85rem; color: var(--muted); line-height: 1.7; padding-left: 0.6rem; border-left: 2px solid var(--border); }
+
+  .options { display: grid; grid-template-columns: 1fr 1fr; gap: 0.55rem; }
+  .option { padding: 0.75rem 1rem; border: 1px solid var(--border); background: transparent;
+    color: var(--text); font-family: 'Gowun Dodum', sans-serif; font-size: 0.88rem;
+    text-align: left; cursor: pointer; transition: all 0.12s;
+    display: flex; align-items: flex-start; gap: 0.6rem; line-height: 1.5; }
+  .option:hover:not(:disabled) { border-color: var(--accent); background: rgba(200,245,100,0.04); }
+  .option.correct { border-color: var(--correct); background: rgba(74,222,128,0.08); color: var(--correct); }
+  .option.wrong   { border-color: var(--wrong);   background: rgba(248,113,113,0.08); color: var(--wrong); }
+  .option-key { font-size: 0.6rem; color: var(--muted); font-family: 'DM Mono', monospace; min-width: 1rem; flex-shrink: 0; padding-top: 3px; }
+  .option.correct .option-key { color: var(--correct); } .option.wrong .option-key { color: var(--wrong); }
+
+  .feedback { margin-top: 1rem; padding: 0.75rem 1rem; font-size: 0.78rem; border-left: 2px solid transparent; display: none; font-family: 'Gowun Dodum', sans-serif; line-height: 1.6; }
+  .feedback.show { display: block; }
+  .feedback.correct { border-color: var(--correct); color: var(--correct); }
+  .feedback.wrong   { border-color: var(--wrong);   color: var(--wrong); }
+
+  .nav { width: 100%; max-width: 740px; display: flex; justify-content: flex-end; margin-bottom: 2rem; }
+  .next-btn { padding: 0.65rem 1.5rem; color: #0f0f0f; border: none;
+    font-family: 'DM Mono', monospace; font-size: 0.78rem; font-weight: 500;
+    letter-spacing: 0.05em; cursor: pointer; display: none; transition: opacity 0.15s; }
+  .next-btn:hover { opacity: 0.85; } .next-btn.show { display: block; }
+  .next-btn.en2ko { background: var(--accent); }
+  .next-btn.ko2en { background: var(--accent3); }
+  .next-btn.blank { background: var(--accent2); }
+
+  .result { width: 100%; max-width: 740px; display: none; flex-direction: column; gap: 1.5rem; animation: fadeIn 0.3s ease; }
+  .result.show { display: flex; }
+  .result-score { font-size: 3.8rem; font-weight: 500; letter-spacing: -0.04em; line-height: 1; }
+  .score-en2ko { color: var(--accent); } .score-ko2en { color: var(--accent3); } .score-blank { color: var(--accent2); }
+  .result-sub { font-size: 0.78rem; color: var(--muted); margin-top: 0.3rem; }
+  .result-breakdown { border: 1px solid var(--border); background: var(--surface); max-height: 420px; overflow-y: auto; }
+  .breakdown-row { display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 0.65rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.73rem; gap: 1rem; }
+  .breakdown-row:last-child { border-bottom: none; }
+  .breakdown-q { font-family: 'Gowun Dodum', sans-serif; flex: 1; line-height: 1.5; }
+  .breakdown-typed { font-size: 0.65rem; color: var(--muted); margin-top: 0.2rem; }
+  .breakdown-status { font-size: 0.7rem; white-space: nowrap; padding-top: 2px; }
+  .ok { color: var(--correct); } .fail { color: var(--wrong); }
+  .result-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+  .ra-btn { padding: 0.65rem 1.3rem; background: transparent; border: 1px solid var(--border);
+    color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.75rem; cursor: pointer; transition: all 0.15s; }
+  .ra-btn:hover { color: var(--text); border-color: #555; }
+  .ra-btn.p-en2ko { border-color: var(--accent);  color: var(--accent); }
+  .ra-btn.p-en2ko:hover { background: var(--accent);  color: #0f0f0f; }
+  .ra-btn.p-ko2en { border-color: var(--accent3); color: var(--accent3); }
+  .ra-btn.p-ko2en:hover { background: var(--accent3); color: #0f0f0f; }
+  .ra-btn.p-blank  { border-color: var(--accent2); color: var(--accent2); }
+  .ra-btn.p-blank:hover  { background: var(--accent2); color: #0f0f0f; }
+
+  .json-block { width: 100%; max-width: 740px; margin-top: 2.5rem; border: 1px solid var(--border); background: var(--surface); }
+  .json-header { display: flex; justify-content: space-between; align-items: center; padding: 0.55rem 1rem; border-bottom: 1px solid var(--border); cursor: pointer; }
+  .json-header span { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.12em; }
+  .json-toggle { font-size: 0.62rem; color: var(--accent2); letter-spacing: 0.1em; }
+  .json-content { display: none; padding: 1rem; font-size: 0.68rem; color: #888; white-space: pre-wrap; word-break: break-all; max-height: 300px; overflow-y: auto; line-height: 1.6; }
+  .json-content.open { display: block; }
+  .copy-btn { padding: 0.35rem 0.7rem; background: transparent; border: 1px solid var(--border); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.62rem; cursor: pointer; }
+  .copy-btn:hover { color: var(--text); border-color: #444; }
+
+  /* Typing input */
+  .input-wrap { display: flex; gap: 0.5rem; align-items: stretch; }
+  .answer-input {
+    flex: 1; padding: 0.75rem 1rem; background: #111;
+    border: 1px solid var(--border); color: var(--text);
+    font-family: 'Gowun Dodum', sans-serif; font-size: 1rem;
+    outline: none; transition: border-color 0.15s;
+  }
+  .answer-input:focus { border-color: var(--accent3); }
+  .answer-input.correct { border-color: var(--correct); background: rgba(74,222,128,0.05); }
+  .answer-input.wrong   { border-color: var(--wrong);   background: rgba(248,113,113,0.05); }
+  .answer-input:disabled { opacity: 0.7; }
+  .submit-btn {
+    padding: 0.75rem 1.2rem; background: var(--accent3); color: #0f0f0f;
+    border: none; font-family: 'DM Mono', monospace; font-size: 0.75rem;
+    font-weight: 500; cursor: pointer; white-space: nowrap; transition: opacity 0.15s;
+  }
+  .submit-btn:hover { opacity: 0.85; }
+  .submit-btn:disabled { opacity: 0.4; cursor: default; }
+  .action-row { display: flex; gap: 0.5rem; margin-top: 0.7rem; }
+  .hint-btn, .skip-btn {
+    padding: 0.4rem 0.8rem; background: transparent; border: 1px solid var(--border);
+    color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.65rem;
+    cursor: pointer; letter-spacing: 0.05em; transition: all 0.12s;
+  }
+  .hint-btn:hover { border-color: var(--accent3); color: var(--accent3); }
+  .skip-btn:hover { border-color: #555; color: var(--text); }
+  .hint-btn:disabled, .skip-btn:disabled { opacity: 0.3; cursor: default; }
+  .hint-text { font-size: 0.7rem; color: var(--accent2); margin-top: 0.5rem; display: none; }
+  .hint-text.show { display: block; }
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="label">Trophy 9 · 2B Unit 3-4</div>
+  <h1>I'm a Volunteer</h1>
+  <div class="subtitle">22 words — 3가지 모드 · 복수형/과거형 함께 표시</div>
+</header>
+
+<div class="section-tabs">
+  <button class="section-tab active-en2ko" onclick="switchSection('en2ko')">
+    ① 영어 → 한국어<br><span style="font-size:0.58rem;opacity:0.7">4지선다</span>
+  </button>
+  <button class="section-tab" onclick="switchSection('ko2en')">
+    ② 한국어 → 영어<br><span style="font-size:0.58rem;opacity:0.7">직접 입력</span>
+  </button>
+  <button class="section-tab" onclick="switchSection('blank')">
+    ③ 예문 빈칸<br><span style="font-size:0.58rem;opacity:0.7">4지선다</span>
+  </button>
+</div>
+
+<div class="progress-bar-wrap">
+  <div class="progress-meta">
+    <span id="prog-label">0 / 0</span>
+    <span id="score-label">정답 0</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill fill-en2ko" id="prog-fill" style="width:0%"></div></div>
+</div>
+
+<div class="card" id="quiz-card">
+  <div class="q-type en2ko" id="q-type">EN → KO</div>
+  <div class="q-num" id="q-num"></div>
+  <div class="q-word" id="q-word"></div>
+  <div class="q-hint" id="q-hint"></div>
+  <div class="forms-tag" id="forms-tag"></div>
+  <div class="sentence-box" id="sentence-box" style="display:none">
+    <div class="sentence-en" id="sentence-en"></div>
+    <div class="sentence-ko" id="sentence-ko"></div>
+  </div>
+  <div class="options" id="options"></div>
+
+  <!-- typing input (ko2en) -->
+  <div id="typing-area" style="display:none">
+    <div class="input-wrap">
+      <input class="answer-input" id="answer-input" type="text"
+        placeholder="영어 단어를 입력하세요..."
+        autocomplete="off" autocorrect="off" spellcheck="false"/>
+      <button class="submit-btn" id="submit-btn" onclick="submitTyping()">확인</button>
+    </div>
+    <div class="action-row">
+      <button class="hint-btn" id="hint-btn" onclick="showHint()">힌트 (첫 글자)</button>
+      <button class="skip-btn" id="skip-btn" onclick="skipQuestion()">건너뛰기</button>
+    </div>
+    <div class="hint-text" id="hint-text"></div>
+  </div>
+
+  <div class="feedback" id="feedback"></div>
+</div>
+
+<div class="nav">
+  <button class="next-btn en2ko" id="next-btn" onclick="next()">다음 →</button>
+</div>
+
+<div class="result" id="result">
+  <div>
+    <div class="result-score score-en2ko" id="result-score"></div>
+    <div class="result-sub" id="result-sub"></div>
+  </div>
+  <div class="result-breakdown" id="breakdown"></div>
+  <div class="result-actions" id="result-actions"></div>
+</div>
+
+<div class="json-block">
+  <div class="json-header" onclick="toggleJson()">
+    <span>RAW JSON DATA</span>
+    <div style="display:flex;gap:0.5rem;align-items:center">
+      <button class="copy-btn" onclick="event.stopPropagation();copyJson()">COPY</button>
+      <span class="json-toggle" id="json-toggle">SHOW ▾</span>
+    </div>
+  </div>
+  <div class="json-content" id="json-content"></div>
+</div>
+
+<script>
+const VOCAB = [
+  { en: "shelter",     ko: "쉼터, 보호소",       pos: "n", plural: "shelters",    irregular: false,
+    exEn: "That is the day I work at the animal shelter.",
+    exKo: "그 날은 내가 동물보호소에서 일하는 날이다." },
+  { en: "route",       ko: "길, 경로",           pos: "n", plural: "routes",      irregular: false,
+    exEn: "Here is a map of the route that we take to the animal shelter.",
+    exKo: "여기 동물보호소로 가는 데 우리가 택한 길을 보여주는 지도가 있다." },
+  { en: "volunteer",   ko: "자원봉사자",          pos: "n", plural: "volunteers",  irregular: false,
+    exEn: "We are volunteers.",
+    exKo: "우리는 자원봉사자들이다." },
+  { en: "pay",         ko: "지불하다",            pos: "v", past: "paid",  pp: "paid",  irregular: true,
+    exEn: "Volunteers are people who do not get paid for their work.",
+    exKo: "자원봉사자들은 그들이 일한 것에 대해 대가를 받지 않는 사람들이다.",
+    blankWord: "paid" },
+  { en: "chase",       ko: "뒤쫓다",             pos: "v", past: "chased", pp: "chased", irregular: false,
+    exEn: "Some of the cats like to chase their tails.",
+    exKo: "어떤 고양이들은 그들의 꼬리를 뒤쫓는 것을 좋아한다." },
+  { en: "together",    ko: "같이",               pos: "adv",
+    exEn: "The cats like to play together.",
+    exKo: "고양이들은 같이 노는 것을 좋아한다." },
+  { en: "laugh",       ko: "(소리내어) 웃다",      pos: "v", past: "laughed", pp: "laughed", irregular: false,
+    exEn: "They make us laugh.",
+    exKo: "그들은 우리를 웃게 해 준다." },
+  { en: "help",        ko: "돕다",               pos: "v", past: "helped", pp: "helped", irregular: false,
+    exEn: "My friend Stacy helps out at the animal shelter, too.",
+    exKo: "내 친구 Stacy도 동물보호소에서 돕는 일을 한다.",
+    blankWord: "helps" },
+  { en: "ready",       ko: "준비가 된",           pos: "adj",
+    exEn: "But then he is ready to run!",
+    exKo: "하지만 그때 그는 달릴 준비가 되어 있다!" },
+  { en: "exercise",    ko: "운동",               pos: "n", plural: "— (불가산)", irregular: false,
+    exEn: "It is important for Buster to get some exercise.",
+    exKo: "Buster에게는 운동을 하는 것이 중요하다." },
+  { en: "bring",       ko: "가져다 주다",          pos: "v", past: "brought", pp: "brought", irregular: true,
+    exEn: "I bring him a small ball to play with.",
+    exKo: "나는 그에게 가지고 놀 수 있는 작은 공 하나를 가져다 준다." },
+  { en: "shake",       ko: "악수를 하다",          pos: "v", past: "shook",   pp: "shaken",  irregular: true,
+    exEn: "I taught Buster to shake hands.",
+    exKo: "나는 Buster에게 악수하는 것을 가르쳤다." },
+  { en: "near",        ko: "~에 가까운",           pos: "prep",
+    exEn: "The shelter is near my home.",
+    exKo: "보호소는 우리 집에서 가깝다." },
+  { en: "later",       ko: "나중에",              pos: "adv",
+    exEn: "\"See you later,\" I tell Mom.",
+    exKo: "\"나중에 봐요,\" 나는 엄마에게 말한다." },
+  { en: "alone",       ko: "혼자",               pos: "adv",
+    exEn: "I am scared to go out alone at night.",
+    exKo: "나는 밤에 혼자 나가는 것을 무서워 한다." },
+  { en: "activity",    ko: "활동",               pos: "n", plural: "activities", irregular: false,
+    exEn: "Let's think about what volunteer activities you can do at school.",
+    exKo: "여러분이 학교에서 할 수 있는 자원봉사활동에 대해 생각해 보자.",
+    blankWord: "activities" },
+  { en: "bank",        ko: "은행",               pos: "n", plural: "banks",      irregular: false,
+    exEn: "The bank is near the post office.",
+    exKo: "은행은 우체국 가까이에 있다." },
+  { en: "post office", ko: "우체국",              pos: "n", plural: "post offices", irregular: false,
+    exEn: "I can buy some stamps at the post office.",
+    exKo: "나는 우체국에서 우표를 살 수 있다." },
+  { en: "zoo",         ko: "동물원",              pos: "n", plural: "zoos",       irregular: false,
+    exEn: "Two baby tigers were born in the zoo.",
+    exKo: "두 마리의 아기 호랑이가 동물원에서 태어났다." },
+  { en: "animal",      ko: "동물",               pos: "n", plural: "animals",    irregular: false,
+    exEn: "I like to have small animals like cats and dogs.",
+    exKo: "나는 개와 고양이처럼 작은 동물을 갖고 싶다.",
+    blankWord: "animals" },
+  { en: "important",   ko: "중요한",              pos: "adj",
+    exEn: "It is important for Buster to get some exercise.",
+    exKo: "Buster에게는 운동을 하는 것이 중요하다." },
+  { en: "slowly",      ko: "느리게",              pos: "adv",
+    exEn: "We move slowly at first because he is a little old.",
+    exKo: "그는 조금 나이가 들었기 때문에 우리는 처음에 천천히 움직인다." },
+];
+
+// ── forms builder ─────────────────────────────────────────────────────────────
+function buildFormsHtml(item) {
+  const parts = [];
+  if (item.pos === 'n' && item.plural) {
+    const isUncountable = item.plural.includes('불가산') || item.plural === '—';
+    if (isUncountable) {
+      parts.push(`<span class="forms-label">복수형</span><span class="forms-irreg">없음 (불가산명사)</span>`);
+    } else {
+      const tag = item.irregular ? 'forms-irreg' : '';
+      const note = item.irregular ? ' <span class="forms-irreg">(불규칙)</span>' : ' (규칙)';
+      parts.push(`<span class="forms-label">복수형</span><span class="${tag}">${item.plural}</span>${note}`);
+    }
+  }
+  if (item.pos === 'v' && item.past) {
+    const tag = item.irregular ? 'forms-irreg' : '';
+    const note = item.irregular ? ' <span class="forms-irreg">(불규칙)</span>' : ' (규칙)';
+    parts.push(
+      `<span class="forms-label">과거형</span><span class="${tag}">${item.past}</span>` +
+      `&nbsp;&nbsp;<span class="forms-label">과거분사</span><span class="${tag}">${item.pp}</span>${note}`
+    );
+  }
+  return parts.join('<br>');
+}
+
+// ── state ─────────────────────────────────────────────────────────────────────
+let section = 'en2ko', queue = [], current = 0, score = 0, answered = false, results = [], hintUsed = false;
+
+// ── helpers ───────────────────────────────────────────────────────────────────
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+function getWrong(correct, field, count) {
+  return shuffle(VOCAB.filter(v => v[field] !== correct[field])).slice(0, count).map(v => v[field]);
+}
+function makeSentenceWithBlank(item) {
+  if (item.customBlank) return item.customBlank.replace(/<BLANK>/g, '___BLANK___');
+  const word = item.blankWord || item.en;
+  const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`\\b${escaped}\\b`, 'i');
+  if (regex.test(item.exEn)) return item.exEn.replace(regex, '___BLANK___');
+  const idx = item.exEn.toLowerCase().indexOf(word.toLowerCase());
+  if (idx !== -1) return item.exEn.slice(0, idx) + '___BLANK___' + item.exEn.slice(idx + word.length);
+  return item.exEn + ' [___BLANK___]';
+}
+function renderBlank(s, revealed, word) {
+  const parts = s.split('___BLANK___');
+  if (!revealed) return parts.join('<span class="blank">?</span>');
+  const fills = word.includes('~') ? word.split('~') : [word];
+  let result = '';
+  parts.forEach((part, i) => {
+    result += part;
+    if (i < parts.length - 1) {
+      const fill = fills[i] !== undefined ? fills[i] : fills[fills.length - 1];
+      result += `<span class="blank revealed">${fill}</span>`;
+    }
+  });
+  return result;
+}
+
+// ── build queue ───────────────────────────────────────────────────────────────
+function buildQueue() {
+  return shuffle(VOCAB).map(item => {
+    if (section === 'en2ko') return {
+      item, section, qTypeLabel: 'EN → KO',
+      question: item.en, hint: '이 단어의 한국어 뜻은?',
+      correct: item.ko, options: shuffle([item.ko, ...getWrong(item, 'ko', 3)]),
+      isTyping: false, isSentence: false,
+    };
+    if (section === 'ko2en') return {
+      item, section, qTypeLabel: 'KO → EN',
+      question: item.ko, hint: '이 뜻의 영어 단어를 입력하세요.',
+      correct: item.en, hintChar: item.en[0],
+      isTyping: true, isSentence: false,
+    };
+    const blankCorrect = item.customAnswer || item.blankWord || item.en;
+    return {
+      item, section, qTypeLabel: 'FILL IN THE BLANK',
+      correct: blankCorrect,
+      options: shuffle([blankCorrect, ...getWrong(item, 'en', 3)]),
+      isTyping: false, isSentence: true,
+      sentenceWithBlank: makeSentenceWithBlank(item),
+      sentenceKo: item.exKo,
+    };
+  });
+}
+
+// ── render ────────────────────────────────────────────────────────────────────
+function renderQuestion() {
+  const q = queue[current];
+  const qtEl = document.getElementById('q-type');
+  qtEl.textContent = q.qTypeLabel; qtEl.className = `q-type ${q.section}`;
+  document.getElementById('q-num').textContent = `문제 ${current + 1} / ${queue.length}`;
+  const qWordEl = document.getElementById('q-word');
+  const qHintEl = document.getElementById('q-hint');
+  const formsEl = document.getElementById('forms-tag');
+  const sentBox = document.getElementById('sentence-box');
+  const optDiv  = document.getElementById('options');
+  sentBox.style.display = 'none';
+  optDiv.innerHTML = '';
+  formsEl.className = 'forms-tag'; formsEl.innerHTML = '';
+  const typingDiv = document.getElementById('typing-area');
+  typingDiv.style.display = 'none';
+
+  if (q.isSentence) {
+    qWordEl.style.display = 'none'; qHintEl.style.display = 'none';
+    sentBox.style.display = 'block';
+    document.getElementById('sentence-en').innerHTML = renderBlank(q.sentenceWithBlank, false, '');
+    document.getElementById('sentence-ko').textContent = q.sentenceKo;
+  } else {
+    qWordEl.style.display = 'block'; qHintEl.style.display = 'block';
+    qWordEl.textContent = q.question; qHintEl.textContent = q.hint;
+  }
+
+  if (q.isTyping) {
+    typingDiv.style.display = 'block';
+    const inp = document.getElementById('answer-input');
+    inp.value = ''; inp.className = 'answer-input'; inp.disabled = false;
+    inp.placeholder = '영어 단어를 입력하세요...';
+    document.getElementById('submit-btn').disabled = false;
+    document.getElementById('hint-btn').disabled   = false;
+    document.getElementById('skip-btn').disabled   = false;
+    document.getElementById('hint-text').className = 'hint-text';
+    document.getElementById('hint-text').textContent = '';
+    hintUsed = false;
+    setTimeout(() => inp.focus(), 50);
+  } else {
+    const keys = ['①','②','③','④'];
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'option';
+      btn.innerHTML = `<span class="option-key">${keys[i]}</span>${opt}`;
+      btn.onclick = () => selectMC(btn, opt, q);
+      optDiv.appendChild(btn);
+    });
+  }
+  document.getElementById('feedback').className = 'feedback';
+  const nb = document.getElementById('next-btn');
+  nb.classList.remove('show'); nb.className = `next-btn ${q.section}`;
+  answered = false; updateProgress();
+}
+
+function showForms(item) {
+  const html = buildFormsHtml(item);
+  if (!html) return;
+  const el = document.getElementById('forms-tag');
+  el.innerHTML = html; el.classList.add('show');
+}
+
+function selectMC(btn, selected, q) {
+  if (answered) return;
+  answered = true;
+  document.querySelectorAll('.option').forEach(b => {
+    b.disabled = true;
+    if (b.textContent.replace(/[①②③④]/,'').trim() === q.correct) b.classList.add('correct');
+  });
+  if (q.isSentence) document.getElementById('sentence-en').innerHTML = renderBlank(q.sentenceWithBlank, true, q.correct);
+  const fb = document.getElementById('feedback');
+  if (selected === q.correct) {
+    btn.classList.add('correct'); fb.className = 'feedback correct show'; fb.textContent = '✓ 정답';
+    score++; results.push({ item: q.item, ok: true });
+  } else {
+    btn.classList.add('wrong'); fb.className = 'feedback wrong show';
+    fb.textContent = `✗ 오답 — 정답: ${q.correct}`;
+    results.push({ item: q.item, ok: false });
+  }
+  showForms(q.item);
+  document.getElementById('score-label').textContent = `정답 ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function next() {
+  current++;
+  if (current >= queue.length) showResult();
+  else renderQuestion();
+}
+
+function updateProgress() {
+  const pct = queue.length ? (current / queue.length * 100) : 0;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-fill').className = `progress-fill fill-${section}`;
+  document.getElementById('prog-label').textContent = `${current + 1} / ${queue.length}`;
+}
+
+function showResult() {
+  document.getElementById('quiz-card').style.display = 'none';
+  document.querySelector('.nav').style.display = 'none';
+  document.getElementById('result').classList.add('show');
+  document.getElementById('prog-fill').style.width = '100%';
+  document.getElementById('prog-label').textContent = `${queue.length} / ${queue.length}`;
+  const pct = Math.round(score / queue.length * 100);
+  const scoreEl = document.getElementById('result-score');
+  scoreEl.textContent = `${score} / ${queue.length}`; scoreEl.className = `result-score score-${section}`;
+  document.getElementById('result-sub').textContent =
+    `정답률 ${pct}% — ${pct >= 80 ? '훌륭해요!' : pct >= 60 ? '조금 더 연습해봐요.' : '다시 한 번 도전!'}`;
+  document.getElementById('breakdown').innerHTML = results.map(r => `
+    <div class="breakdown-row">
+      <div>
+        <div class="breakdown-q">${r.item.en} — ${r.item.ko}</div>
+        ${r.typed && !r.ok ? `<div class="breakdown-typed" style="font-size:0.65rem;color:var(--muted);margin-top:0.2rem">입력: ${r.typed}</div>` : ''}
+      </div>
+      <span class="breakdown-status ${r.ok ? 'ok' : 'fail'}">${r.ok ? '✓' : '✗'}</span>
+    </div>`).join('');
+  const others = ['en2ko','ko2en','blank'].filter(s => s !== section);
+  const labels = { en2ko: '① 영어→한국어', ko2en: '② 한국어→영어', blank: '③ 예문 빈칸' };
+  document.getElementById('result-actions').innerHTML =
+    `<button class="ra-btn p-${section}" onclick="startQuiz()">다시 풀기</button>` +
+    others.map(s => `<button class="ra-btn" onclick="switchSection('${s}')">${labels[s]}</button>`).join('');
+}
+
+
+function normalize(s) { return s.trim().toLowerCase().replace(/\s+/g, ' '); }
+function checkTyping(input, correct) {
+  const inp = normalize(input), cor = normalize(correct);
+  if (inp === cor) return true;
+  return cor.split(',').map(p => p.trim()).some(p => inp === p);
+}
+
+function submitTyping() {
+  if (answered) return;
+  const q = queue[current];
+  const inp = document.getElementById('answer-input');
+  const val = inp.value.trim();
+  if (!val) { inp.focus(); return; }
+  answered = true;
+  inp.disabled = true;
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('hint-btn').disabled   = true;
+  document.getElementById('skip-btn').disabled   = true;
+  const fb = document.getElementById('feedback');
+  if (checkTyping(val, q.correct)) {
+    inp.className = 'answer-input correct';
+    fb.className  = 'feedback correct show';
+    fb.textContent = '✓ 정답';
+    score++;
+    results.push({ item: q.item, ok: true, typed: val });
+  } else {
+    inp.className = 'answer-input wrong';
+    fb.className  = 'feedback wrong show';
+    fb.innerHTML  = `✗ 오답 — 정답: <strong>${q.correct}</strong>`;
+    results.push({ item: q.item, ok: false, typed: val });
+  }
+  showForms(q.item);
+  document.getElementById('score-label').textContent = `정답 ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function showHint() {
+  if (answered || hintUsed) return;
+  hintUsed = true;
+  const q = queue[current];
+  const ht = document.getElementById('hint-text');
+  ht.textContent = `힌트: "${q.hintChar}..."`;
+  ht.classList.add('show');
+  document.getElementById('hint-btn').disabled = true;
+  document.getElementById('answer-input').focus();
+}
+
+function skipQuestion() {
+  if (answered) return;
+  const q = queue[current];
+  answered = true;
+  document.getElementById('answer-input').disabled = true;
+  document.getElementById('submit-btn').disabled   = true;
+  document.getElementById('hint-btn').disabled     = true;
+  document.getElementById('skip-btn').disabled     = true;
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback wrong show';
+  fb.innerHTML = `건너뜀 — 정답: <strong>${q.correct}</strong>`;
+  results.push({ item: q.item, ok: false, typed: '(건너뜀)' });
+  showForms(q.item);
+  document.getElementById('next-btn').classList.add('show');
+}
+
+function switchSection(s) {
+  section = s;
+  document.querySelectorAll('.section-tab').forEach((b, i) => {
+    const sects = ['en2ko','ko2en','blank'];
+    b.className = `section-tab${s === sects[i] ? ' active-' + sects[i] : ''}`;
+  });
+  startQuiz();
+}
+
+function startQuiz() {
+  queue = buildQueue(); current = 0; score = 0; answered = false; results = []; hintUsed = false;
+  document.getElementById('score-label').textContent = '정답 0';
+  document.getElementById('quiz-card').style.display = 'block';
+  document.querySelector('.nav').style.display = 'flex';
+  document.getElementById('result').classList.remove('show');
+  renderQuestion();
+}
+
+function toggleJson() {
+  const c = document.getElementById('json-content');
+  const t = document.getElementById('json-toggle');
+  c.classList.toggle('open');
+  t.textContent = c.classList.contains('open') ? 'HIDE ▴' : 'SHOW ▾';
+}
+function copyJson() {
+  navigator.clipboard.writeText(JSON.stringify(VOCAB, null, 2)).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'COPIED ✓';
+    setTimeout(() => btn.textContent = 'COPY', 1500);
+  });
+}
+
+document.getElementById('answer-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { if (!answered) submitTyping(); else next(); }
+});
+
+document.getElementById('json-content').textContent = JSON.stringify(VOCAB, null, 2);
+startQuiz();
+</script>
+</body>
+</html>
