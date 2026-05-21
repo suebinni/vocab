@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Power 6A – 예문 4지선다 퀴즈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --rose:    #c85c78;
+  --rose-lt: #f8e8ee;
+  --rose-md: #f0c6d3;
+  --plum:    #7d3654;
+  --cream:   #fef6f0;
+  --card:    #ffffff;
+  --text:    #2d1a24;
+  --muted:   #8a6a76;
+  --correct: #2d9e6b;
+  --correct-lt: #d4f5e7;
+  --wrong:   #d64545;
+  --wrong-lt: #fde8e8;
+  --shadow:  0 4px 24px rgba(120,40,70,0.10);
+}
+
+body {
+  font-family: 'Nunito', 'Noto Sans KR', sans-serif;
+  background: var(--cream);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 48px;
+}
+
+/* ── HEADER ── */
+.site-header {
+  width: 100%;
+  max-width: 700px;
+  text-align: center;
+  margin-bottom: 28px;
+}
+.site-header h1 {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: var(--plum);
+  letter-spacing: -0.5px;
+}
+.site-header p {
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.header-bar {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: var(--rose-lt);
+  color: var(--rose);
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 30px 32px;
+  width: 100%;
+  max-width: 700px;
+  box-shadow: var(--shadow);
+}
+
+/* ── START SCREEN ── */
+#start-screen .card { text-align: center; }
+.start-icon { font-size: 3.5rem; margin-bottom: 12px; }
+.start-title { font-size: 1.5rem; font-weight: 800; color: var(--plum); }
+.start-desc  { font-size: 0.92rem; color: var(--muted); margin: 10px 0 24px; line-height: 1.7; }
+
+.info-row {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.info-box {
+  background: var(--rose-lt);
+  border-radius: 14px;
+  padding: 14px 22px;
+  text-align: center;
+  min-width: 100px;
+}
+.info-box .num  { font-size: 2rem; font-weight: 800; color: var(--rose); line-height: 1; }
+.info-box .lbl  { font-size: 0.75rem; color: var(--muted); margin-top: 4px; font-weight: 600; }
+
+.lesson-chips {
+  display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 28px;
+}
+.lesson-chip {
+  font-size: 0.78rem; font-weight: 700;
+  background: var(--rose-md); color: var(--plum);
+  padding: 5px 12px; border-radius: 20px;
+}
+
+/* ── BUTTONS ── */
+.btn-primary {
+  display: block; width: 100%; padding: 15px;
+  background: var(--rose); color: #fff;
+  border: none; border-radius: 14px;
+  font-size: 1.05rem; font-weight: 800;
+  cursor: pointer; font-family: inherit;
+  letter-spacing: 0.3px;
+  transition: background 0.18s, transform 0.12s;
+}
+.btn-primary:hover { background: var(--plum); transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+
+/* ── PROGRESS BAR ── */
+.progress-wrap { width: 100%; max-width: 700px; margin-bottom: 16px; }
+.progress-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.82rem; color: var(--muted); font-weight: 600; margin-bottom: 6px;
+}
+.score-pill {
+  background: var(--rose-lt); color: var(--rose);
+  padding: 2px 10px; border-radius: 20px; font-weight: 800;
+}
+.bar-track {
+  height: 8px; background: var(--rose-md); border-radius: 4px; overflow: hidden;
+}
+.bar-fill {
+  height: 100%; background: linear-gradient(90deg, var(--rose), #e8829a);
+  border-radius: 4px; transition: width 0.35s ease;
+}
+
+/* ── QUIZ CARD ── */
+#quiz-screen .card { padding-bottom: 24px; }
+
+.quiz-top {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;
+}
+.lesson-badge {
+  font-size: 0.73rem; font-weight: 800; color: var(--rose);
+  background: var(--rose-lt); padding: 3px 10px; border-radius: 20px;
+  letter-spacing: 0.3px;
+}
+.qnum { font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+
+.sentence {
+  font-size: 1.18rem; line-height: 1.85; color: var(--text);
+  margin-bottom: 12px; word-break: keep-all;
+}
+.blank-word {
+  display: inline-block;
+  background: var(--rose-lt);
+  color: var(--rose);
+  font-weight: 800;
+  padding: 1px 14px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  letter-spacing: 3px;
+  border-bottom: 2px solid var(--rose-md);
+}
+.translation {
+  font-size: 0.92rem; color: var(--muted); line-height: 1.65;
+  padding: 10px 14px; background: var(--cream);
+  border-radius: 10px; border-left: 3px solid var(--rose-md);
+}
+
+/* ── CHOICES ── */
+.choices {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 22px;
+}
+.choice-btn {
+  padding: 13px 16px; border-radius: 12px;
+  border: 2px solid var(--rose-md); background: #fff;
+  color: var(--text); font-size: 0.97rem; font-weight: 600;
+  cursor: pointer; transition: all 0.18s; font-family: inherit;
+  text-align: center; line-height: 1.3; word-break: keep-all;
+}
+.choice-btn:hover:not(:disabled) {
+  border-color: var(--rose); background: var(--rose-lt); color: var(--plum);
+}
+.choice-btn.correct {
+  background: var(--correct-lt); border-color: var(--correct);
+  color: #1a5c3e; font-weight: 800;
+}
+.choice-btn.wrong {
+  background: var(--wrong-lt); border-color: var(--wrong);
+  color: #7f1d1d; font-weight: 700;
+}
+.choice-btn:disabled { cursor: default; }
+
+/* ── FEEDBACK ── */
+.feedback {
+  margin-top: 14px; padding: 12px 16px; border-radius: 12px;
+  font-size: 0.9rem; font-weight: 700; display: none; line-height: 1.5;
+}
+.feedback.show { display: block; }
+.feedback.ok  { background: var(--correct-lt); color: #1a5c3e; }
+.feedback.bad { background: var(--wrong-lt);   color: #7f1d1d; }
+
+/* ── NEXT BUTTON ── */
+.next-btn {
+  display: none; width: 100%; max-width: 700px;
+  padding: 14px; background: var(--plum); color: #fff;
+  border: none; border-radius: 14px; font-size: 1rem; font-weight: 800;
+  cursor: pointer; margin-top: 14px; font-family: inherit;
+  transition: opacity 0.18s, transform 0.12s;
+}
+.next-btn:hover  { opacity: 0.88; transform: translateY(-1px); }
+.next-btn:active { transform: translateY(0); }
+.next-btn.show   { display: block; }
+
+/* ── RESULTS ── */
+#results-screen { width: 100%; max-width: 700px; }
+.result-top { text-align: center; padding: 12px 0 24px; }
+.result-emoji { font-size: 3.5rem; }
+.result-grade { font-size: 1.4rem; font-weight: 800; color: var(--plum); margin-top: 8px; }
+.result-score { font-size: 3.5rem; font-weight: 800; color: var(--rose); line-height: 1; margin-top: 4px; }
+.result-sub   { font-size: 0.88rem; color: var(--muted); margin-top: 4px; }
+
+.result-breakdown { margin-top: 8px; }
+.result-breakdown h3 { font-size: 0.9rem; font-weight: 800; color: var(--muted); margin-bottom: 10px; letter-spacing: 0.5px; }
+
+.result-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid var(--rose-lt);
+}
+.ri-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+.ri-body { flex: 1; }
+.ri-word {
+  font-size: 0.95rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 6px;
+}
+.ri-lesson {
+  font-size: 0.68rem; font-weight: 700; background: var(--rose-lt);
+  color: var(--rose); padding: 1px 7px; border-radius: 10px;
+}
+.ri-sent { font-size: 0.8rem; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+.ri-wrong-answer { font-size: 0.8rem; color: var(--wrong); margin-top: 2px; }
+
+.restart-row { margin-top: 18px; display: flex; gap: 10px; }
+.btn-secondary {
+  flex: 1; padding: 13px;
+  background: var(--rose-lt); color: var(--rose);
+  border: 2px solid var(--rose-md); border-radius: 14px;
+  font-size: 0.9rem; font-weight: 800;
+  cursor: pointer; font-family: inherit;
+  transition: background 0.18s;
+}
+.btn-secondary:hover { background: var(--rose-md); }
+
+/* ── RAW DATA ── */
+.raw-data-wrap {
+  width: 100%; max-width: 700px; margin-top: 20px;
+}
+.raw-toggle {
+  background: none; border: 1.5px solid var(--rose-md);
+  color: var(--rose); padding: 7px 14px; border-radius: 10px;
+  font-size: 0.82rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  transition: background 0.18s;
+}
+.raw-toggle:hover { background: var(--rose-lt); }
+.raw-box {
+  display: none; margin-top: 10px; background: #1e1b2e;
+  border-radius: 14px; padding: 18px; position: relative;
+}
+.raw-box.open { display: block; }
+.copy-btn {
+  position: absolute; top: 12px; right: 12px;
+  background: var(--rose); color: #fff;
+  border: none; padding: 5px 13px; border-radius: 8px;
+  font-size: 0.78rem; font-weight: 700; cursor: pointer; font-family: inherit;
+}
+.copy-btn:hover { background: var(--plum); }
+pre { color: #cdd6f4; font-size: 0.74rem; line-height: 1.55; overflow: auto; max-height: 320px; white-space: pre-wrap; word-break: break-all; }
+
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="site-header">
+  <h1>📖 Word Power 6A</h1>
+  <p>예문으로 익히는 4지선다 어휘 퀴즈</p>
+  <div class="header-bar">
+    <span class="tag">Lesson 13&14</span>
+    <span class="tag">Lesson 15&16</span>
+    <span class="tag">Lesson 17&18</span>
+    <span class="tag">Lesson 19&20</span>
+    <span class="tag">Lesson 21&22</span>
+    <span class="tag">Lesson 23&24</span>
+  </div>
+</div>
+
+<!-- ① START SCREEN -->
+<div id="start-screen">
+  <div class="card">
+    <div class="start-icon">✏️</div>
+    <div class="start-title">예문 퀴즈 시작!</div>
+    <div class="start-desc">
+      각 문장에서 <strong>?</strong>에 들어갈 단어를 4개 보기 중에서 골라요.<br>
+      한국어 해석을 참고해도 좋아요.
+    </div>
+    <div class="info-row">
+      <div class="info-box"><div class="num">40</div><div class="lbl">총 문항</div></div>
+      <div class="info-box"><div class="num">6</div><div class="lbl">레슨</div></div>
+      <div class="info-box"><div class="num">4</div><div class="lbl">지선다</div></div>
+    </div>
+    <button class="btn-primary" onclick="startQuiz()">퀴즈 시작하기 →</button>
+  </div>
+</div>
+
+<!-- ② QUIZ SCREEN -->
+<div id="quiz-screen" class="hidden">
+  <div class="progress-wrap">
+    <div class="progress-meta">
+      <span id="q-counter">1 / 40</span>
+      <span class="score-pill" id="score-pill">정답 0</span>
+    </div>
+    <div class="bar-track">
+      <div class="bar-fill" id="bar-fill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="quiz-top">
+      <span class="lesson-badge" id="lesson-badge">Lesson 13&14</span>
+      <span class="qnum" id="qnum">Q1</span>
+    </div>
+    <div class="sentence" id="sentence-text"></div>
+    <div class="translation" id="translation-text"></div>
+    <div class="choices" id="choices-wrap"></div>
+    <div class="feedback" id="feedback"></div>
+  </div>
+  <button class="next-btn" id="next-btn" onclick="nextQuestion()">다음 문제 →</button>
+</div>
+
+<!-- ③ RESULTS SCREEN -->
+<div id="results-screen" class="hidden">
+  <div class="card">
+    <div class="result-top">
+      <div class="result-emoji" id="result-emoji">🎉</div>
+      <div class="result-grade" id="result-grade">훌륭해요!</div>
+      <div class="result-score" id="result-score">40 / 40</div>
+      <div class="result-sub" id="result-sub">정답률 100%</div>
+    </div>
+    <div class="result-breakdown">
+      <h3>📋 문항별 결과</h3>
+      <div id="result-list"></div>
+    </div>
+    <div class="restart-row">
+      <button class="btn-secondary" onclick="restartQuiz()">🔁 다시 풀기</button>
+      <button class="btn-primary" style="flex:2" onclick="restartShuffle()">🔀 순서 섞어서 다시 풀기</button>
+    </div>
+  </div>
+</div>
+
+<!-- RAW DATA -->
+<div class="raw-data-wrap">
+  <button class="raw-toggle" onclick="toggleRaw()">📂 원본 데이터 보기 (AI 학습용)</button>
+  <div class="raw-box" id="raw-box">
+    <button class="copy-btn" id="copy-btn" onclick="copyData()">복사</button>
+    <pre id="raw-pre"></pre>
+  </div>
+</div>
+
+
+<script>
+// ═══════════════════════════════
+//  QUIZ DATA  (40 items)
+// ═══════════════════════════════
+const ALL_DATA = [
+  // ── Lesson 13&14 ──
+  { id:1, lesson:"13&14", word:"scatter",
+    sentence:"Strong winds can [?] seeds across a very wide area.",
+    translation:"강한 바람은 씨앗을 넓은 지역에 흩어지게 할 수 있다.",
+    choices:["scatter","collide","neglect","hesitate"] },
+
+  { id:2, lesson:"13&14", word:"wavelength",
+    sentence:"Blue light has a shorter [?] than red light.",
+    translation:"파란빛은 빨간빛보다 파장이 짧다.",
+    choices:["gravity","wavelength","canvas","crisis"] },
+
+  { id:3, lesson:"13&14", word:"atmosphere",
+    sentence:"Earth's [?] protects us from harmful rays coming from the sun.",
+    translation:"지구의 대기는 태양의 해로운 광선으로부터 우리를 보호한다.",
+    choices:["atmosphere","wavelength","creature","canvas"] },
+
+  { id:4, lesson:"13&14", word:"collide",
+    sentence:"When two vehicles [?] at high speed, the result can be deadly.",
+    translation:"두 차량이 고속으로 충돌하면 결과가 치명적일 수 있다.",
+    choices:["scatter","hesitate","collide","disappear"] },
+
+  { id:5, lesson:"13&14", word:"unaffected",
+    sentence:"She remained [?] by the bad news and continued to work calmly.",
+    translation:"그녀는 나쁜 소식에 영향을 받지 않고 침착하게 계속 일했다.",
+    choices:["outgoing","extreme","ancient","unaffected"] },
+
+  { id:6, lesson:"13&14", word:"especially",
+    sentence:"I love eating fruit, [?] strawberries and ripe mangoes.",
+    translation:"나는 과일, 특히 딸기와 잘 익은 망고 먹는 것을 좋아한다.",
+    choices:["especially","meanwhile","unlikely","despite"] },
+
+  { id:7, lesson:"13&14", word:"consist of",
+    sentence:"Water and ice both [?] hydrogen and oxygen atoms.",
+    translation:"물과 얼음은 둘 다 수소와 산소 원자로 이루어진다.",
+    choices:["put off","consist of","in danger","such as"] },
+
+  // ── Lesson 15&16 ──
+  { id:8, lesson:"15&16", word:"disappear",
+    sentence:"The rainbow will [?] shortly after the rain stops.",
+    translation:"비가 그치면 얼마 후 무지개가 사라질 것이다.",
+    choices:["scatter","disappear","escalate","neglect"] },
+
+  { id:9, lesson:"15&16", word:"countless",
+    sentence:"There are [?] stars visible in the clear night sky.",
+    translation:"맑은 밤하늘에는 셀 수 없이 많은 별들이 보인다.",
+    choices:["ancient","outgoing","countless","sufficient"] },
+
+  { id:10, lesson:"15&16", word:"in danger",
+    sentence:"Many sea turtles are [?] because of increasing ocean pollution.",
+    translation:"많은 바다거북이 증가하는 해양 오염으로 인해 멸종 위기에 처해 있다.",
+    choices:["in danger","consist of","put off","such as"] },
+
+  { id:11, lesson:"15&16", word:"extreme",
+    sentence:"The Sahara desert experiences [?] heat during the summer months.",
+    translation:"사하라 사막은 여름 동안 극심한 더위를 경험한다.",
+    choices:["ongoing","extreme","countless","outgoing"] },
+
+  { id:12, lesson:"15&16", word:"ongoing",
+    sentence:"The [?] research into the disease may soon lead to a cure.",
+    translation:"그 질병에 대한 계속 진행 중인 연구가 곧 치료법으로 이어질 수 있다.",
+    choices:["unlikely","outgoing","ongoing","unaffected"] },
+
+  { id:13, lesson:"15&16", word:"outgoing",
+    sentence:"She is very [?] and manages to make friends wherever she goes.",
+    translation:"그녀는 매우 외향적이어서 어딜 가든 친구를 사귀는 데 성공한다.",
+    choices:["outgoing","extreme","ancient","ongoing"] },
+
+  { id:14, lesson:"15&16", word:"put off",
+    sentence:"Don't [?] your homework until the very last minute.",
+    translation:"숙제를 마지막 순간까지 미루지 마라.",
+    choices:["consist of","in danger","put off","such as"] },
+
+  // ── Lesson 17&18 ──
+  { id:15, lesson:"17&18", word:"manufacturer",
+    sentence:"This [?] produces well over a million cars every single year.",
+    translation:"이 제조사는 매년 백만 대가 훨씬 넘는 차를 생산한다.",
+    choices:["interpreter","manufacturer","creature","generation"] },
+
+  { id:16, lesson:"17&18", word:"convenient",
+    sentence:"Online shopping is extremely [?] for busy working people.",
+    translation:"온라인 쇼핑은 바쁜 직장인들에게 매우 편리하다.",
+    choices:["economical","convenient","sufficient","outgoing"] },
+
+  { id:17, lesson:"17&18", word:"economical",
+    sentence:"This small hybrid car is very [?] on fuel compared to larger ones.",
+    translation:"이 소형 하이브리드 차는 대형차에 비해 연료 면에서 매우 경제적이다.",
+    choices:["economical","convenient","ancient","ongoing"] },
+
+  { id:18, lesson:"17&18", word:"interpreter",
+    sentence:"The [?] helped the two world leaders communicate clearly and smoothly.",
+    translation:"통역사가 두 세계 지도자들이 명확하고 원활하게 소통하도록 도왔다.",
+    choices:["manufacturer","generation","interpreter","creature"] },
+
+  { id:19, lesson:"17&18", word:"hesitate",
+    sentence:"Don't [?] to ask your teacher for help when you need it most.",
+    translation:"가장 도움이 필요할 때 선생님에게 도움을 망설이지 말고 요청해라.",
+    choices:["scatter","neglect","collide","hesitate"] },
+
+  { id:20, lesson:"17&18", word:"escalate",
+    sentence:"A small misunderstanding between friends can quickly [?] into a big conflict.",
+    translation:"친구들 사이의 작은 오해가 빠르게 큰 갈등으로 확대될 수 있다.",
+    choices:["escalate","disappear","sacrifice","overhear"] },
+
+  { id:21, lesson:"17&18", word:"such as",
+    sentence:"I enjoy outdoor activities [?] hiking, cycling, and camping on weekends.",
+    translation:"나는 주말에 하이킹, 자전거 타기, 캠핑과 같은 야외 활동을 즐긴다.",
+    choices:["put off","in danger","consist of","such as"] },
+
+  // ── Lesson 19&20 ──
+  { id:22, lesson:"19&20", word:"bandage",
+    sentence:"The nurse carefully wrapped a clean [?] around his injured arm.",
+    translation:"간호사는 그의 부상당한 팔에 깨끗한 붕대를 조심스럽게 감았다.",
+    choices:["overcoat","canvas","bandage","crisis"] },
+
+  { id:23, lesson:"19&20", word:"canvas",
+    sentence:"The artist spent three weeks painting a beautiful landscape on a large [?].",
+    translation:"그 화가는 큰 캔버스에 아름다운 풍경을 그리는 데 3주를 보냈다.",
+    choices:["canvas","overcoat","bandage","wavelength"] },
+
+  { id:24, lesson:"19&20", word:"overcoat",
+    sentence:"She wore a thick [?] to protect herself from the freezing cold wind.",
+    translation:"그녀는 꽁꽁 어는 차가운 바람으로부터 몸을 보호하기 위해 두꺼운 외투를 입었다.",
+    choices:["canvas","overcoat","bandage","gravity"] },
+
+  { id:25, lesson:"19&20", word:"sufficient",
+    sentence:"Eight hours of sleep each night is [?] for most adults to stay healthy.",
+    translation:"매일 밤 8시간의 수면은 대부분의 성인이 건강을 유지하기에 충분하다.",
+    choices:["extreme","ancient","sufficient","outgoing"] },
+
+  { id:26, lesson:"19&20", word:"transfer",
+    sentence:"You will need to [?] to the green subway line at City Hall station.",
+    translation:"시청역에서 녹색 지하철 노선으로 환승해야 할 것이다.",
+    choices:["transfer","scatter","hesitate","neglect"] },
+
+  { id:27, lesson:"19&20", word:"crisis",
+    sentence:"The country faced a severe economic [?] that affected millions of people.",
+    translation:"그 나라는 수백만 명의 사람들에게 영향을 미친 심각한 경제 위기에 직면했다.",
+    choices:["wavelength","gravity","atmosphere","crisis"] },
+
+  // ── Lesson 21&22 ──
+  { id:28, lesson:"21&22", word:"neglect",
+    sentence:"It is important not to [?] both your physical and mental health.",
+    translation:"신체적, 정신적 건강 모두 소홀히 하지 않는 것이 중요하다.",
+    choices:["neglect","hesitate","scatter","transfer"] },
+
+  { id:29, lesson:"21&22", word:"despite",
+    sentence:"[?] the heavy rain, the players bravely continued to play outside.",
+    translation:"폭우에도 불구하고 선수들은 용감하게 계속 밖에서 경기를 했다.",
+    choices:["especially","meanwhile","despite","such as"] },
+
+  { id:30, lesson:"21&22", word:"generation",
+    sentence:"Each [?] faces its own unique set of social and economic challenges.",
+    translation:"각 세대는 고유한 사회적, 경제적 도전에 직면한다.",
+    choices:["manufacturer","generation","interpreter","creature"] },
+
+  { id:31, lesson:"21&22", word:"ancient",
+    sentence:"Archaeologists discovered a well-preserved [?] tomb near the pyramids in Egypt.",
+    translation:"고고학자들이 이집트 피라미드 근처에서 잘 보존된 고대 무덤을 발견했다.",
+    choices:["ongoing","extreme","outgoing","ancient"] },
+
+  { id:32, lesson:"21&22", word:"overhear",
+    sentence:"I didn't intend to [?] their private conversation in the school hallway.",
+    translation:"나는 학교 복도에서 그들의 개인적인 대화를 엿들으려 한 것이 아니었다.",
+    choices:["neglect","overhear","sacrifice","escalate"] },
+
+  { id:33, lesson:"21&22", word:"sacrifice",
+    sentence:"Good parents willingly [?] their own comfort and wishes for their children.",
+    translation:"좋은 부모는 자녀를 위해 기꺼이 자신의 편안함과 바람을 희생한다.",
+    choices:["sacrifice","neglect","overhear","hesitate"] },
+
+  { id:34, lesson:"21&22", word:"meanwhile",
+    sentence:"Tom studied hard for the big exam; [?], his sister relaxed and watched TV.",
+    translation:"Tom은 중요한 시험을 열심히 공부했다. 그 동안 그의 여동생은 쉬며 TV를 봤다.",
+    choices:["especially","despite","unlikely","meanwhile"] },
+
+  // ── Lesson 23&24 ──
+  { id:35, lesson:"23&24", word:"gravity",
+    sentence:"[?] is the invisible natural force that keeps us firmly on the ground.",
+    translation:"중력은 우리를 지면에 단단히 붙잡아 두는 보이지 않는 자연의 힘이다.",
+    choices:["gravity","wavelength","atmosphere","canvas"] },
+
+  { id:36, lesson:"23&24", word:"habitability",
+    sentence:"Scientists carefully study the [?] of Mars before planning future missions there.",
+    translation:"과학자들은 화성에 미래 임무를 계획하기 전에 거주 가능성을 신중하게 연구한다.",
+    choices:["wavelength","crisis","habitability","generation"] },
+
+  { id:37, lesson:"23&24", word:"unlikely",
+    sentence:"It is [?] that it will snow in the middle of a hot, humid summer.",
+    translation:"뜨겁고 습한 여름 한가운데 눈이 올 것 같지는 않다.",
+    choices:["outgoing","unaffected","extreme","unlikely"] },
+
+  { id:38, lesson:"23&24", word:"creature",
+    sentence:"The deep sea is home to many strange and mysterious [?]s.",
+    translation:"심해는 많은 이상하고 신비로운 생명체들의 서식지이다.",
+    choices:["creature","manufacturer","interpreter","generation"] },
+
+  { id:39, lesson:"23&24", word:"amusement park",
+    sentence:"We had an absolutely fantastic time at the [?] during the school holidays.",
+    translation:"우리는 학교 방학 동안 놀이공원에서 정말 환상적인 시간을 보냈다.",
+    choices:["amusement park","gravity","canvas","atmosphere"] },
+
+  { id:40, lesson:"23&24", word:"seasick",
+    sentence:"Many passengers felt terribly [?] during the rough and stormy sea voyage.",
+    translation:"많은 승객들이 거칠고 폭풍우 치는 항해 중에 뱃멀미를 심하게 느꼈다.",
+    choices:["outgoing","unlikely","seasick","sufficient"] }
+];
+
+// ═══════════════════════════════
+//  STATE
+// ═══════════════════════════════
+let quizData = [];
+let current  = 0;
+let score    = 0;
+let answers  = [];   // { id, word, correct, selected }
+let shuffledChoices = [];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz(reshuffleAll) {
+  quizData = reshuffleAll ? shuffle(ALL_DATA) : [...ALL_DATA];
+  current = 0; score = 0; answers = [];
+  show('quiz-screen');
+  hide('start-screen');
+  hide('results-screen');
+  renderQuestion();
+}
+
+function restartQuiz()    { startQuiz(false); }
+function restartShuffle() { startQuiz(true); }
+
+// ═══════════════════════════════
+//  RENDER
+// ═══════════════════════════════
+function renderQuestion() {
+  const item = quizData[current];
+
+  // Progress
+  document.getElementById('q-counter').textContent = `${current + 1} / ${quizData.length}`;
+  document.getElementById('score-pill').textContent = `정답 ${score}`;
+  document.getElementById('bar-fill').style.width = `${(current / quizData.length) * 100}%`;
+
+  // Meta
+  document.getElementById('lesson-badge').textContent = `Lesson ${item.lesson}`;
+  document.getElementById('qnum').textContent = `Q${current + 1}`;
+
+  // Sentence – replace [?] with styled blank
+  const sentHTML = item.sentence.replace('[?]', '<span class="blank-word">?</span>');
+  document.getElementById('sentence-text').innerHTML = sentHTML;
+  document.getElementById('translation-text').textContent = item.translation;
+
+  // Choices (shuffled)
+  shuffledChoices = shuffle(item.choices);
+  const wrap = document.getElementById('choices-wrap');
+  wrap.innerHTML = '';
+  shuffledChoices.forEach((ch, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = ch;
+    btn.onclick = () => selectAnswer(i);
+    wrap.appendChild(btn);
+  });
+
+  // Hide feedback & next
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.textContent = '';
+  document.getElementById('next-btn').className = 'next-btn';
+}
+
+function selectAnswer(idx) {
+  const item = quizData[current];
+  const chosen = shuffledChoices[idx];
+  const isCorrect = chosen === item.word;
+
+  // Disable all
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach(b => b.disabled = true);
+
+  // Mark
+  btns[idx].classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) {
+    // Highlight the correct one
+    const correctIdx = shuffledChoices.indexOf(item.word);
+    if (correctIdx >= 0) btns[correctIdx].classList.add('correct');
+  }
+
+  // Feedback
+  const fb = document.getElementById('feedback');
+  if (isCorrect) {
+    score++;
+    fb.textContent = '✅ 정답이에요!';
+    fb.className = 'feedback ok show';
+  } else {
+    fb.textContent = `❌ 정답은 「${item.word}」 이에요.`;
+    fb.className = 'feedback bad show';
+  }
+
+  document.getElementById('score-pill').textContent = `정답 ${score}`;
+
+  // Record
+  answers.push({ id: item.id, lesson: item.lesson, word: item.word,
+    sentence: item.sentence, translation: item.translation,
+    correct: isCorrect, selected: chosen });
+
+  // Show next button
+  const nb = document.getElementById('next-btn');
+  nb.textContent = current + 1 < quizData.length ? '다음 문제 →' : '결과 보기 →';
+  nb.className = 'next-btn show';
+}
+
+function nextQuestion() {
+  current++;
+  if (current < quizData.length) {
+    renderQuestion();
+  } else {
+    showResults();
+  }
+}
+
+// ═══════════════════════════════
+//  RESULTS
+// ═══════════════════════════════
+function showResults() {
+  hide('quiz-screen');
+  document.getElementById('next-btn').className = 'next-btn';
+  show('results-screen');
+
+  const pct = Math.round((score / quizData.length) * 100);
+
+  // Emoji + grade
+  let emoji = '🎉', grade = '훌륭해요!';
+  if (pct >= 90)      { emoji='🏆'; grade='완벽에 가까워요!'; }
+  else if (pct >= 75) { emoji='😄'; grade='잘했어요!'; }
+  else if (pct >= 60) { emoji='🙂'; grade='좋아요, 조금만 더!'; }
+  else if (pct >= 40) { emoji='😅'; grade='다시 한번 도전해봐요!'; }
+  else                { emoji='💪'; grade='포기하지 말고 복습해요!'; }
+
+  document.getElementById('result-emoji').textContent = emoji;
+  document.getElementById('result-grade').textContent = grade;
+  document.getElementById('result-score').textContent = `${score} / ${quizData.length}`;
+  document.getElementById('result-sub').textContent   = `정답률 ${pct}%`;
+
+  // Breakdown list
+  const list = document.getElementById('result-list');
+  list.innerHTML = '';
+  answers.forEach(a => {
+    const div = document.createElement('div');
+    div.className = 'result-item';
+    const sentShort = a.sentence.replace('[?]', `【${a.word}】`);
+    div.innerHTML = `
+      <div class="ri-icon">${a.correct ? '✅' : '❌'}</div>
+      <div class="ri-body">
+        <div class="ri-word">
+          <strong>${a.word}</strong>
+          <span class="ri-lesson">Lesson ${a.lesson}</span>
+        </div>
+        <div class="ri-sent">${sentShort}</div>
+        <div class="ri-sent" style="color:#888">${a.translation}</div>
+        ${!a.correct ? `<div class="ri-wrong-answer">내 답: ${a.selected}</div>` : ''}
+      </div>`;
+    list.appendChild(div);
+  });
+
+  // Raw data
+  document.getElementById('raw-pre').textContent =
+    JSON.stringify(answers.map(a => ({
+      lesson: a.lesson, word: a.word,
+      sentence_en: a.sentence,
+      sentence_kr: a.translation,
+      correct: a.correct, selected: a.selected
+    })), null, 2);
+}
+
+// ═══════════════════════════════
+//  UTILS
+// ═══════════════════════════════
+function show(id) { document.getElementById(id).classList.remove('hidden'); }
+function hide(id) { document.getElementById(id).classList.add('hidden'); }
+
+function toggleRaw() {
+  document.getElementById('raw-box').classList.toggle('open');
+}
+function copyData() {
+  const text = document.getElementById('raw-pre').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = '복사됨 ✓';
+    setTimeout(() => btn.textContent = '복사', 2000);
+  });
+}
+
+// Show raw data on start screen too (all vocab data)
+document.getElementById('raw-pre').textContent =
+  JSON.stringify(ALL_DATA.map(d => ({
+    lesson: d.lesson, word: d.word,
+    sentence_en: d.sentence,
+    sentence_kr: d.translation,
+    choices: d.choices
+  })), null, 2);
+</script>
+</body>
+</html>
