@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Paul Bunyan Unscramble</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bark:#3E2A1B;
+    --bark-dark:#2A1B10;
+    --wood:#C1873F;
+    --wood-light:#E4B876;
+    --forest:#2F4A3D;
+    --forest-dark:#203228;
+    --cream:#F7EFDD;
+    --paper:#FFFBF2;
+    --flannel:#B4432E;
+    --flannel-dark:#7E2E1E;
+    --ink:#2A1B10;
+    --ink-soft:#6B5A46;
+    --ok:#3F7D4C;
+    --ok-bg:#E4F1E5;
+    --bad:#B4432E;
+    --bad-bg:#FBE9E5;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Karla', sans-serif;
+    background:
+      linear-gradient(180deg, var(--forest) 0%, var(--forest) 220px, var(--cream) 220px, var(--cream) 100%);
+    color:var(--ink);
+    min-height:100vh;
+    padding-bottom:60px;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:0 20px;}
+
+  header{
+    padding:40px 0 30px;
+    text-align:center;
+    color:var(--paper);
+  }
+  .axe{
+    width:56px;height:56px;margin:0 auto 14px;
+    display:block;
+  }
+  h1{
+    font-family:'Alfa Slab One', serif;
+    font-size:34px;
+    letter-spacing:1px;
+    margin:0 0 8px;
+    text-shadow:2px 2px 0 var(--forest-dark);
+  }
+  header p{
+    margin:0;
+    font-size:15px;
+    color:var(--wood-light);
+    letter-spacing:0.5px;
+  }
+
+  .log-strip{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    margin:26px 0 0;
+    flex-wrap:wrap;
+  }
+  .ring{
+    width:26px;height:26px;border-radius:50%;
+    border:3px solid rgba(255,255,255,0.35);
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:700;color:rgba(255,255,255,0.55);
+    background:transparent;
+    transition:all .25s ease;
+  }
+  .ring.done{
+    border-color:var(--wood-light);
+    background:var(--wood-light);
+    color:var(--bark-dark);
+  }
+  .ring.current{
+    border-color:var(--paper);
+    color:var(--paper);
+  }
+
+  main{margin-top:34px;}
+
+  .card{
+    background:var(--paper);
+    border:1px solid #E4D6B8;
+    border-radius:14px;
+    padding:32px 28px;
+    box-shadow:0 10px 0 -4px rgba(42,27,16,0.06), 0 2px 6px rgba(42,27,16,0.08);
+    position:relative;
+  }
+  .card::before{
+    content:"";
+    position:absolute;
+    left:0;right:0;top:0;
+    height:6px;
+    background:var(--flannel);
+    border-radius:14px 14px 0 0;
+  }
+
+  .q-label{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .q-num{
+    font-family:'Alfa Slab One', serif;
+    font-size:20px;
+    color:var(--flannel);
+  }
+  .q-hint{
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+
+  .answer-strip{
+    min-height:62px;
+    background:repeating-linear-gradient(
+      var(--cream), var(--cream) 41px, #E9DCC0 41px, #E9DCC0 43px
+    );
+    border:2px dashed #D8C49A;
+    border-radius:10px;
+    padding:10px;
+    display:flex;
+    flex-wrap:wrap;
+    align-content:flex-start;
+    gap:8px;
+    margin-bottom:16px;
+  }
+  .answer-strip.empty::after{
+    content:"단어를 순서대로 눌러 문장을 만드세요";
+    color:#B9A985;
+    font-size:14px;
+    padding:8px 4px;
+  }
+
+  .tile{
+    font-family:'Karla', sans-serif;
+    font-weight:700;
+    font-size:15px;
+    background:var(--wood);
+    color:var(--paper);
+    border:none;
+    border-bottom:3px solid #8F6127;
+    border-radius:6px;
+    padding:9px 14px;
+    cursor:pointer;
+    transition:transform .1s ease, opacity .15s ease;
+  }
+  .tile:hover{ transform:translateY(-2px); }
+  .tile:active{ transform:translateY(1px); }
+
+  .bank{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:22px;
+    min-height:44px;
+  }
+  .bank .tile{
+    background:var(--forest);
+    border-bottom-color:var(--forest-dark);
+  }
+  .bank .tile.used{
+    opacity:0.25;
+    cursor:default;
+    pointer-events:none;
+  }
+
+  .controls{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  button.action{
+    font-family:'Karla', sans-serif;
+    font-weight:700;
+    font-size:14px;
+    padding:11px 20px;
+    border-radius:8px;
+    border:none;
+    cursor:pointer;
+    transition:filter .15s ease;
+  }
+  button.action:hover{ filter:brightness(1.06); }
+  button.action:disabled{ opacity:0.4; cursor:default; filter:none; }
+
+  .btn-check{ background:var(--flannel); color:var(--paper); }
+  .btn-reset{ background:transparent; color:var(--ink-soft); border:1.5px solid #D8C49A; }
+  .btn-next{ background:var(--forest); color:var(--paper); }
+
+  .feedback{
+    margin-top:16px;
+    padding:12px 14px;
+    border-radius:8px;
+    font-size:14px;
+    font-weight:700;
+    display:none;
+  }
+  .feedback.show{ display:block; }
+  .feedback.correct{ background:var(--ok-bg); color:var(--ok); }
+  .feedback.wrong{ background:var(--bad-bg); color:var(--bad); }
+  .feedback .answer-key{
+    display:block;
+    font-weight:400;
+    margin-top:4px;
+    color:var(--ink-soft);
+  }
+
+  .score-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin:18px 0 -4px;
+    padding:0 4px;
+    font-size:13px;
+    color:var(--paper);
+    opacity:0.85;
+  }
+
+  .done-card{
+    text-align:center;
+    padding:48px 28px;
+  }
+  .done-card .stump{
+    width:70px;height:70px;
+    margin:0 auto 18px;
+    border-radius:50%;
+    background:var(--wood);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--paper);
+    font-family:'Alfa Slab One', serif;
+    font-size:26px;
+    border:6px solid var(--wood-light);
+  }
+  .done-card h2{
+    font-family:'Alfa Slab One', serif;
+    font-size:24px;
+    margin:0 0 8px;
+    color:var(--bark);
+  }
+  .done-card p{ color:var(--ink-soft); margin:0 0 24px; }
+
+  .review-list{
+    margin-top:30px;
+    text-align:left;
+    border-top:1px solid #E4D6B8;
+    padding-top:22px;
+  }
+  .review-item{
+    display:flex;
+    gap:12px;
+    padding:12px 4px;
+    border-bottom:1px solid #EFE5CC;
+  }
+  .review-item:last-child{ border-bottom:none; }
+  .review-mark{
+    flex:0 0 24px;
+    font-weight:700;
+    font-size:15px;
+    padding-top:2px;
+  }
+  .review-mark.correct{ color:var(--ok); }
+  .review-mark.wrong{ color:var(--bad); }
+  .review-body{ flex:1; font-size:14px; line-height:1.5; }
+  .review-num{
+    font-family:'Alfa Slab One', serif;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-right:6px;
+  }
+  .review-given{ color:var(--ink); }
+  .review-given.wrong-text{ color:var(--bad); text-decoration:line-through; }
+  .review-correct{ color:var(--ok-bg); }
+  .review-correct-label{
+    display:block;
+    margin-top:2px;
+    color:var(--ok);
+    font-weight:700;
+  }
+
+  footer{
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:12px;
+    margin-top:30px;
+  }
+
+  @media (max-width:480px){
+    h1{font-size:26px;}
+    .card{padding:24px 18px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <svg class="axe" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="29" y="10" width="6" height="42" rx="2" fill="#E4B876"/>
+      <path d="M32 6 C20 6 10 14 10 24 C10 28 13 30 17 30 L32 30 C32 30 32 14 32 6 Z" fill="#F7EFDD" stroke="#3E2A1B" stroke-width="2"/>
+      <circle cx="32" cy="54" r="4" fill="#B4432E"/>
+    </svg>
+    <h1>Paul Bunyan Unscramble</h1>
+    <p>TROPHY9 · 2C05 문장 재배열 연습</p>
+    <div class="log-strip" id="ringStrip"></div>
+  </header>
+
+  <main>
+    <div class="score-bar">
+      <span id="progressText">문제 1 / 8</span>
+      <span id="scoreText">점수 0 / 8</span>
+    </div>
+
+    <div class="card" id="quizCard">
+      <div class="q-label">
+        <span class="q-num" id="qNum">(1)</span>
+        <span class="q-hint">단어를 순서대로 눌러 문장을 완성하세요</span>
+      </div>
+
+      <div class="answer-strip empty" id="answerStrip"></div>
+
+      <div class="bank" id="wordBank"></div>
+
+      <div class="controls">
+        <button class="action btn-check" id="checkBtn">확인하기</button>
+        <button class="action btn-reset" id="resetBtn">다시 배열</button>
+        <button class="action btn-next" id="nextBtn" disabled>다음 문제 →</button>
+      </div>
+
+      <div class="feedback" id="feedback"></div>
+    </div>
+
+    <div class="card done-card" id="doneCard" style="display:none;">
+      <div class="stump" id="finalScore">0/8</div>
+      <h2 id="doneTitle">잘했어요!</h2>
+      <p id="doneSub">모든 문장을 완성했습니다.</p>
+      <button class="action btn-next" id="restartBtn">처음부터 다시 하기</button>
+      <div class="review-list" id="reviewList"></div>
+    </div>
+  </main>
+
+  <footer>Trophy9 · American Language School — 2C05 Paul Bunyan</footer>
+</div>
+
+<script>
+const questions = [
+  { words: ["the","baby.","He","was","biggest"], answer: "He was the biggest baby." },
+  { words: ["was","big","He","as","dad.","as","his"], answer: "He was as big as his dad." },
+  { words: ["taller","than","He","the","trees.","was"], answer: "He was taller than the trees." },
+  { words: ["baby","A","big","born.","was","very"], answer: "A very big baby was born." },
+  { words: ["than","ate","He","more","bowls","of","40","hot","cereal."], answer: "He ate more than 40 bowls of hot cereal." },
+  { words: ["He","could","down","trees","cut","more","than","anyone."], answer: "He could cut down more trees than anyone." },
+  { words: ["to","eat","worked.","before","he","liked","Paul"], answer: "Paul liked to eat before he worked." },
+  { words: ["liked","He","to","pancakes","most.","the","eat"], answer: "He liked to eat pancakes the most." }
+];
+
+let current = 0;
+let score = 0;
+let placed = [];
+let bankState = [];
+let answered = false;
+let userAnswers = [];
+
+const ringStrip = document.getElementById('ringStrip');
+const qNum = document.getElementById('qNum');
+const answerStrip = document.getElementById('answerStrip');
+const wordBank = document.getElementById('wordBank');
+const checkBtn = document.getElementById('checkBtn');
+const resetBtn = document.getElementById('resetBtn');
+const nextBtn = document.getElementById('nextBtn');
+const feedback = document.getElementById('feedback');
+const progressText = document.getElementById('progressText');
+const scoreText = document.getElementById('scoreText');
+const quizCard = document.getElementById('quizCard');
+const doneCard = document.getElementById('doneCard');
+
+function shuffle(arr){
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function buildRings(){
+  ringStrip.innerHTML = '';
+  questions.forEach((_, i) => {
+    const r = document.createElement('div');
+    r.className = 'ring';
+    r.id = 'ring-' + i;
+    r.textContent = i + 1;
+    ringStrip.appendChild(r);
+  });
+}
+
+function updateRings(){
+  questions.forEach((_, i) => {
+    const r = document.getElementById('ring-' + i);
+    r.classList.remove('done','current');
+    if(i < current) r.classList.add('done');
+    else if(i === current) r.classList.add('current');
+  });
+}
+
+function loadQuestion(){
+  answered = false;
+  placed = [];
+  const q = questions[current];
+  bankState = shuffle(q.words).map(w => ({ word: w, used: false }));
+
+  qNum.textContent = '(' + (current + 1) + ')';
+  progressText.textContent = '문제 ' + (current + 1) + ' / ' + questions.length;
+  scoreText.textContent = '점수 ' + score + ' / ' + questions.length;
+
+  checkBtn.disabled = false;
+  nextBtn.disabled = true;
+  feedback.className = 'feedback';
+  feedback.textContent = '';
+
+  updateRings();
+  render();
+}
+
+function render(){
+  answerStrip.innerHTML = '';
+  answerStrip.classList.toggle('empty', placed.length === 0);
+  placed.forEach((item, idx) => {
+    const t = document.createElement('button');
+    t.className = 'tile';
+    t.textContent = item.word;
+    t.disabled = answered;
+    t.onclick = () => removeWord(idx);
+    answerStrip.appendChild(t);
+  });
+
+  wordBank.innerHTML = '';
+  bankState.forEach((item, idx) => {
+    const t = document.createElement('button');
+    t.className = 'tile' + (item.used ? ' used' : '');
+    t.textContent = item.word;
+    t.disabled = item.used || answered;
+    t.onclick = () => addWord(idx);
+    wordBank.appendChild(t);
+  });
+}
+
+function addWord(idx){
+  if(bankState[idx].used || answered) return;
+  bankState[idx].used = true;
+  placed.push({ word: bankState[idx].word, from: idx });
+  render();
+}
+
+function removeWord(placedIdx){
+  if(answered) return;
+  const item = placed[placedIdx];
+  bankState[item.from].used = false;
+  placed.splice(placedIdx, 1);
+  render();
+}
+
+function resetAnswer(){
+  if(answered) return;
+  bankState.forEach(b => b.used = false);
+  placed = [];
+  render();
+}
+
+function checkAnswer(){
+  if(placed.length === 0 || answered) return;
+  answered = true;
+  const built = placed.map(p => p.word).join(' ');
+  const correct = built === questions[current].answer;
+
+  if(correct) score++;
+
+  userAnswers[current] = { given: built, correct: correct };
+
+  feedback.className = 'feedback show ' + (correct ? 'correct' : 'wrong');
+  feedback.innerHTML = correct
+    ? '정답입니다! 👍'
+    : '아쉬워요. 정답: <span class="answer-key">' + questions[current].answer + '</span>';
+
+  checkBtn.disabled = true;
+  nextBtn.disabled = false;
+  scoreText.textContent = '점수 ' + score + ' / ' + questions.length;
+  render();
+}
+
+function nextQuestion(){
+  if(current < questions.length - 1){
+    current++;
+    loadQuestion();
+  } else {
+    showDone();
+  }
+}
+
+function showDone(){
+  quizCard.style.display = 'none';
+  doneCard.style.display = 'block';
+  document.getElementById('finalScore').textContent = score + '/' + questions.length;
+  const pct = score / questions.length;
+  const title = document.getElementById('doneTitle');
+  const sub = document.getElementById('doneSub');
+  if(pct === 1){
+    title.textContent = '완벽해요, Paul Bunyan!';
+    sub.textContent = '여덟 문장을 모두 맞혔습니다.';
+  } else if(pct >= 0.6){
+    title.textContent = '잘했어요!';
+    sub.textContent = score + '개를 맞혔습니다. 조금만 더 연습해봐요.';
+  } else {
+    title.textContent = '다시 도전해봐요';
+    sub.textContent = '틀린 문장을 다시 살펴보고 재도전하세요.';
+  }
+  updateRings();
+  ringStrip.querySelectorAll('.ring').forEach(r => { r.classList.add('done'); r.classList.remove('current'); });
+
+  renderReview();
+}
+
+function renderReview(){
+  const list = document.getElementById('reviewList');
+  list.innerHTML = '';
+  questions.forEach((q, i) => {
+    const ua = userAnswers[i] || { given: '(응답 없음)', correct: false };
+    const row = document.createElement('div');
+    row.className = 'review-item';
+    row.innerHTML =
+      '<div class="review-mark ' + (ua.correct ? 'correct' : 'wrong') + '">' + (ua.correct ? '✓' : '✕') + '</div>' +
+      '<div class="review-body">' +
+        '<span class="review-num">(' + (i + 1) + ')</span>' +
+        '<span class="review-given' + (ua.correct ? '' : ' wrong-text') + '">' + ua.given + '</span>' +
+        (ua.correct ? '' : '<span class="review-correct-label">정답: ' + q.answer + '</span>') +
+      '</div>';
+    list.appendChild(row);
+  });
+}
+
+function restart(){
+  current = 0;
+  score = 0;
+  userAnswers = [];
+  doneCard.style.display = 'none';
+  quizCard.style.display = 'block';
+  loadQuestion();
+}
+
+checkBtn.addEventListener('click', checkAnswer);
+resetBtn.addEventListener('click', resetAnswer);
+nextBtn.addEventListener('click', nextQuestion);
+document.getElementById('restartBtn').addEventListener('click', restart);
+
+buildRings();
+loadQuestion();
+</script>
+</body>
+</html>
