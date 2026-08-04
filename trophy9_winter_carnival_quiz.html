@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>겨울 축제 단어 놀이터 · Winter Carnival Vocabulary</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Jua&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#eaf6ff; --bg2:#fff6e9;
+    --navy:#1c3b63;
+    --pink:#ff6f91; --pink-deep:#e85577;
+    --teal:#22c1b8; --teal-deep:#0fa89f;
+    --purple:#9b6bff; --purple-deep:#7c4dff;
+    --gold:#ffc93c; --gold-deep:#f2a900;
+    --white:#ffffff;
+    --ink:#26324a;
+    --muted:#7a8aa3;
+    --card-border:#eef2fb;
+    --correct:#2ecc71; --wrong:#ff5c6c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:linear-gradient(160deg,var(--bg1) 0%,var(--bg2) 100%);
+    color:var(--ink);
+    font-family:'Jua','Fredoka',sans-serif;
+    min-height:100vh;
+    display:flex;flex-direction:column;align-items:center;
+    padding:1.6rem 1rem 4rem;
+    position:relative;
+    overflow-x:hidden;
+  }
+  /* floating snow/confetti decoration */
+  .deco{position:fixed;top:-40px;font-size:1.4rem;opacity:0.55;pointer-events:none;animation:fall linear infinite;z-index:0;}
+  @keyframes fall{to{transform:translateY(110vh) rotate(360deg);}}
+
+  header{width:100%;max-width:640px;text-align:center;margin-bottom:1.4rem;position:relative;z-index:1;}
+  .badge{
+    display:inline-block;font-family:'Fredoka',sans-serif;font-weight:700;font-size:0.68rem;
+    letter-spacing:0.12em;color:var(--navy);background:var(--gold);
+    padding:0.35rem 0.9rem;border-radius:999px;margin-bottom:0.6rem;
+    box-shadow:0 3px 0 var(--gold-deep);
+  }
+  h1{font-family:'Fredoka',sans-serif;font-weight:700;font-size:2.1rem;color:var(--navy);letter-spacing:-0.01em;}
+  .subtitle{font-size:0.95rem;color:var(--muted);margin-top:0.35rem;font-family:'Jua',sans-serif;}
+
+  .section-tabs{width:100%;max-width:640px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem;margin-bottom:1.3rem;position:relative;z-index:1;}
+  .section-tab{
+    padding:0.9rem 0.5rem;border:none;border-radius:18px;background:var(--white);color:var(--muted);
+    font-family:'Fredoka',sans-serif;font-weight:600;font-size:0.78rem;cursor:pointer;text-align:center;
+    line-height:1.5;box-shadow:0 3px 0 var(--card-border);transition:transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .section-tab:hover{transform:translateY(-2px);}
+  .section-tab .emoji{display:block;font-size:1.3rem;margin-bottom:0.15rem;}
+  .section-tab.active-en2ko{background:var(--pink);color:#fff;box-shadow:0 4px 0 var(--pink-deep);}
+  .section-tab.active-ko2en{background:var(--teal);color:#fff;box-shadow:0 4px 0 var(--teal-deep);}
+  .section-tab.active-blank{background:var(--purple);color:#fff;box-shadow:0 4px 0 var(--purple-deep);}
+
+  .progress-bar-wrap{width:100%;max-width:640px;margin-bottom:1.4rem;position:relative;z-index:1;}
+  .progress-meta{display:flex;justify-content:space-between;font-size:0.8rem;color:var(--muted);margin-bottom:0.4rem;font-family:'Fredoka',sans-serif;font-weight:500;}
+  .progress-bar{height:10px;background:#e4ecf7;border-radius:999px;overflow:hidden;}
+  .progress-fill{height:100%;border-radius:999px;transition:width 0.4s ease;}
+  .fill-en2ko{background:linear-gradient(90deg,var(--pink),var(--gold));}
+  .fill-ko2en{background:linear-gradient(90deg,var(--teal),var(--gold));}
+  .fill-blank{background:linear-gradient(90deg,var(--purple),var(--pink));}
+
+  .card{
+    width:100%;max-width:640px;background:var(--white);border-radius:28px;
+    padding:2rem 1.6rem 1.7rem;margin-bottom:1.2rem;position:relative;z-index:1;
+    box-shadow:0 10px 0 var(--card-border), 0 16px 30px rgba(28,59,99,0.08);
+    animation:pop 0.25s ease;
+  }
+  @keyframes pop{from{opacity:0;transform:scale(0.96) translateY(8px);}to{opacity:1;transform:scale(1) translateY(0);}}
+
+  .q-type{
+    display:inline-block;font-family:'Fredoka',sans-serif;font-weight:700;font-size:0.72rem;
+    letter-spacing:0.1em;text-transform:uppercase;padding:0.3rem 0.8rem;border-radius:999px;margin-bottom:0.9rem;
+  }
+  .q-type.en2ko{background:rgba(255,111,145,0.14);color:var(--pink-deep);}
+  .q-type.ko2en{background:rgba(34,193,184,0.14);color:var(--teal-deep);}
+  .q-type.blank{background:rgba(155,107,255,0.14);color:var(--purple-deep);}
+
+  .q-num{font-size:0.78rem;color:var(--muted);margin-bottom:0.7rem;font-family:'Fredoka',sans-serif;}
+  .q-word{font-family:'Fredoka',sans-serif;font-size:2.4rem;font-weight:700;color:var(--navy);margin-bottom:0.3rem;line-height:1.25;word-break:keep-all;}
+  .q-hint{font-size:0.92rem;color:var(--muted);margin-bottom:1.5rem;}
+
+  .sentence-box{margin-bottom:1.6rem;}
+  .sentence-en{font-family:'Fredoka',sans-serif;font-size:1.28rem;font-weight:500;color:var(--navy);line-height:1.7;margin-bottom:0.7rem;}
+  .blank{display:inline-block;border-bottom:3px solid var(--purple);min-width:78px;color:var(--purple-deep);font-weight:700;padding:0 6px;text-align:center;}
+  .blank.revealed{color:var(--correct);border-color:var(--correct);}
+  .sentence-ko{font-size:0.92rem;color:var(--muted);line-height:1.7;padding:0.7rem 0.9rem;background:#f6f9ff;border-radius:14px;}
+
+  .options{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;}
+  .option{
+    padding:0.95rem 1rem;border:2px solid #eef2fb;border-radius:16px;background:#fbfdff;color:var(--ink);
+    font-family:'Jua',sans-serif;font-size:1rem;text-align:left;cursor:pointer;
+    display:flex;align-items:flex-start;gap:0.6rem;line-height:1.5;transition:all 0.12s ease;
+  }
+  .option:hover:not(:disabled){border-color:var(--gold);background:#fff9e9;transform:translateY(-2px);}
+  .option.correct{border-color:var(--correct);background:rgba(46,204,113,0.1);color:#1f9c56;}
+  .option.wrong{border-color:var(--wrong);background:rgba(255,92,108,0.1);color:#d43e4e;}
+  .option-key{font-family:'Fredoka',sans-serif;font-weight:700;font-size:0.78rem;color:var(--muted);min-width:1.2rem;flex-shrink:0;padding-top:2px;}
+  .option.correct .option-key{color:#1f9c56;}.option.wrong .option-key{color:#d43e4e;}
+
+  .feedback{margin-top:1.1rem;padding:0.9rem 1.1rem;font-size:0.95rem;border-radius:16px;display:none;line-height:1.6;font-family:'Jua',sans-serif;}
+  .feedback.show{display:block;}
+  .feedback.correct{background:rgba(46,204,113,0.12);color:#1f9c56;}
+  .feedback.wrong{background:rgba(255,92,108,0.12);color:#d43e4e;}
+
+  .info-box{margin-top:0.8rem;padding:0.85rem 1rem;border-radius:16px;background:#f3f0ff;display:none;font-size:0.85rem;color:var(--purple-deep);line-height:1.65;}
+  .info-box.show{display:block;}
+  .info-box .pos-chip{display:inline-block;font-family:'Fredoka',sans-serif;font-weight:700;font-size:0.66rem;letter-spacing:0.06em;background:var(--purple);color:#fff;padding:0.15rem 0.55rem;border-radius:999px;margin-right:0.5rem;text-transform:uppercase;}
+
+  .nav{width:100%;max-width:640px;display:flex;justify-content:flex-end;margin-bottom:2rem;position:relative;z-index:1;}
+  .next-btn{
+    padding:0.85rem 1.9rem;color:#fff;border:none;border-radius:999px;
+    font-family:'Fredoka',sans-serif;font-size:0.95rem;font-weight:700;letter-spacing:0.02em;cursor:pointer;
+    display:none;transition:transform 0.12s ease;
+  }
+  .next-btn:hover{transform:translateY(-2px);}
+  .next-btn.show{display:block;}
+  .next-btn.en2ko{background:var(--pink);box-shadow:0 4px 0 var(--pink-deep);}
+  .next-btn.ko2en{background:var(--teal);box-shadow:0 4px 0 var(--teal-deep);}
+  .next-btn.blank{background:var(--purple);box-shadow:0 4px 0 var(--purple-deep);}
+
+  .result{width:100%;max-width:640px;display:none;flex-direction:column;gap:1.4rem;position:relative;z-index:1;}
+  .result.show{display:flex;animation:pop 0.3s ease;}
+  .result-card{background:var(--white);border-radius:28px;padding:2.2rem 1.8rem;text-align:center;box-shadow:0 10px 0 var(--card-border), 0 16px 30px rgba(28,59,99,0.08);}
+  .result-emoji{font-size:2.8rem;margin-bottom:0.4rem;}
+  .result-score{font-family:'Fredoka',sans-serif;font-weight:700;font-size:3.4rem;letter-spacing:-0.02em;line-height:1;}
+  .score-en2ko{color:var(--pink);}.score-ko2en{color:var(--teal);}.score-blank{color:var(--purple);}
+  .result-sub{font-size:0.95rem;color:var(--muted);margin-top:0.5rem;}
+
+  .result-breakdown{border-radius:22px;background:var(--white);box-shadow:0 6px 0 var(--card-border);max-height:420px;overflow-y:auto;}
+  .breakdown-row{display:flex;justify-content:space-between;align-items:flex-start;padding:0.8rem 1.1rem;border-bottom:1px solid #f0f3fa;font-size:0.85rem;gap:1rem;}
+  .breakdown-row:last-child{border-bottom:none;}
+  .breakdown-q{flex:1;line-height:1.55;}
+  .breakdown-status{font-size:0.95rem;white-space:nowrap;padding-top:1px;}
+  .ok{color:var(--correct);}.fail{color:var(--wrong);}
+
+  .result-actions{display:flex;gap:0.6rem;flex-wrap:wrap;justify-content:center;}
+  .ra-btn{padding:0.75rem 1.4rem;background:var(--white);border:2px solid #eef2fb;border-radius:999px;color:var(--muted);font-family:'Fredoka',sans-serif;font-weight:600;font-size:0.85rem;cursor:pointer;transition:all 0.15s;}
+  .ra-btn:hover{transform:translateY(-2px);}
+  .ra-btn.p-en2ko{border-color:var(--pink);color:var(--pink-deep);}.ra-btn.p-en2ko:hover{background:var(--pink);color:#fff;}
+  .ra-btn.p-ko2en{border-color:var(--teal);color:var(--teal-deep);}.ra-btn.p-ko2en:hover{background:var(--teal);color:#fff;}
+  .ra-btn.p-blank{border-color:var(--purple);color:var(--purple-deep);}.ra-btn.p-blank:hover{background:var(--purple);color:#fff;}
+
+  .data-block{width:100%;max-width:640px;margin-top:1rem;border-radius:20px;background:var(--white);box-shadow:0 6px 0 var(--card-border);position:relative;z-index:1;}
+  .data-header{display:flex;justify-content:space-between;align-items:center;padding:0.8rem 1.1rem;cursor:pointer;font-family:'Fredoka',sans-serif;}
+  .data-header span{font-size:0.78rem;color:var(--muted);font-weight:600;}
+  .data-toggle{font-size:0.72rem;color:var(--purple-deep);font-weight:700;}
+  .data-content{display:none;padding:0 1.1rem 1rem;max-height:300px;overflow-y:auto;}
+  .data-content.open{display:block;}
+  .data-item{padding:0.5rem 0;border-top:1px solid #f0f3fa;font-size:0.82rem;}
+  .data-item b{color:var(--navy);}
+
+  @media (max-width:480px){
+    h1{font-size:1.7rem;}
+    .q-word{font-size:1.9rem;}
+    .options{grid-template-columns:1fr;}
+    .result-score{font-size:2.6rem;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">❄️ WINTER CARNIVAL ❄️</div>
+  <h1>겨울 축제 단어 놀이터</h1>
+  <div class="subtitle">Trophy 9 · 3C-08 · 24개 단어 — 3가지 방식으로 공부해요!</div>
+</header>
+
+<div class="section-tabs">
+  <button class="section-tab active-en2ko" onclick="switchSection('en2ko')"><span class="emoji">🎪</span>① 영어 → 한국어<br><span style="font-size:0.62rem;opacity:0.85">뜻 4지선다</span></button>
+  <button class="section-tab" onclick="switchSection('ko2en')"><span class="emoji">🎡</span>② 한국어 → 영어<br><span style="font-size:0.62rem;opacity:0.85">단어 4지선다</span></button>
+  <button class="section-tab" onclick="switchSection('blank')"><span class="emoji">🎠</span>③ 예문 빈칸<br><span style="font-size:0.62rem;opacity:0.85">문장 4지선다</span></button>
+</div>
+
+<div class="progress-bar-wrap">
+  <div class="progress-meta"><span id="prog-label">0 / 0</span><span id="score-label">⭐ 정답 0</span></div>
+  <div class="progress-bar"><div class="progress-fill fill-en2ko" id="prog-fill" style="width:0%"></div></div>
+</div>
+
+<div class="card" id="quiz-card">
+  <div class="q-type en2ko" id="q-type">EN → KO</div>
+  <div class="q-num" id="q-num"></div>
+  <div class="q-word" id="q-word"></div>
+  <div class="q-hint" id="q-hint"></div>
+  <div class="sentence-box" id="sentence-box" style="display:none">
+    <div class="sentence-en" id="sentence-en"></div>
+    <div class="sentence-ko" id="sentence-ko"></div>
+  </div>
+  <div class="options" id="options"></div>
+  <div class="feedback" id="feedback"></div>
+  <div class="info-box" id="info-box"></div>
+</div>
+
+<div class="nav"><button class="next-btn en2ko" id="next-btn" onclick="next()">다음 →</button></div>
+
+<div class="result" id="result">
+  <div class="result-card">
+    <div class="result-emoji" id="result-emoji">🎉</div>
+    <div class="result-score score-en2ko" id="result-score"></div>
+    <div class="result-sub" id="result-sub"></div>
+  </div>
+  <div class="result-breakdown" id="breakdown"></div>
+  <div class="result-actions" id="result-actions"></div>
+</div>
+
+<div class="data-block">
+  <div class="data-header" onclick="toggleData()">
+    <span>📋 전체 단어 목록 보기</span>
+    <span class="data-toggle" id="data-toggle">펼치기 ▾</span>
+  </div>
+  <div class="data-content" id="data-content"></div>
+</div>
+
+<script>
+const VOCAB = [{"num": 1, "en": "breath", "ko": "입김, 숨", "pos": "n", "def": "the air that goes in and out of your body through your nose or mouth", "exEn": "He watched his warm breath puff out into the cold winter air.", "exKo": "그는 차가운 겨울 공기 속에 그의 따뜻한 입김이 뿜어져 나오는 것을 보았다.", "blankWord": "breath"}, {"num": 2, "en": "clap", "ko": "박수를 치다", "pos": "v", "def": "to hit your hands together many times", "exEn": "Ava laughed and clapped her hands.", "exKo": "Ava는 웃으며 손으로 박수를 쳤다.", "blankWord": "clapped"}, {"num": 3, "en": "carnival", "ko": "축제", "pos": "n", "def": "a public festival involving wearing unusual clothes, dancing, eating and drinking", "exEn": "Time to go to the winter carnival!", "exKo": "겨울 축제에 갈 시간이다!", "blankWord": "carnival"}, {"num": 4, "en": "pound", "ko": "치다, 두드리다", "pos": "v", "def": "to hit something with great force", "exEn": "Theo felt his heart pound.", "exKo": "Theo는 가슴이 두근거리는 것을 느꼈다.", "blankWord": "pound"}, {"num": 5, "en": "spill", "ko": "쏟다, 쏟아져 나오다", "pos": "v", "def": "to accidentally pour a liquid out of its container", "exEn": "He could hear music and laughter spilling out of the building's big front doors.", "exKo": "그는 음악과 웃음소리가 건물의 큰 현관문에서 흘러나오는 것을 들을 수 있었다.", "blankWord": "spilling"}, {"num": 6, "en": "cupcake", "ko": "컵케이크", "pos": "n", "def": "a small cake with icing on top", "exEn": "Would you help me carry these boxes of cupcakes to the snack stand?", "exKo": "이 컵케이크 박스들을 간식 가판대로 나르는 것을 도와주지 않을래?", "blankWord": "cupcakes"}, {"num": 7, "en": "stand", "ko": "가판대", "pos": "n", "def": "a small shop or stall, outdoors or in a large public building", "exEn": "Would you help me carry these boxes of cupcakes to the snack stand?", "exKo": "이 컵케이크 박스들을 간식 가판대로 나르는 것을 도와주지 않을래?", "blankWord": "stand"}, {"num": 8, "en": "sniff", "ko": "킁킁거리다", "pos": "v", "def": "to breathe in noisily through your nose", "exEn": "Theo sniffed the air.", "exKo": "Theo는 킁킁거렸다.", "blankWord": "sniffed"}, {"num": 9, "en": "through", "ko": "~을 통해", "pos": "prep", "def": "from one end or side of something to the other", "exEn": "Theo led his mom away from the snack stand and through the games.", "exKo": "테오는 그의 엄마를 스낵 가판대에서 나와 게임하는 곳을 통과하게 했다.", "blankWord": "through"}, {"num": 10, "en": "booth", "ko": "부스, 칸막이를 한 작은 공간", "pos": "n", "def": "a partly closed area or small tent at a fair, exhibition, or similar event", "exEn": "He led her past the ticket booth and out the front doors of the building.", "exKo": "그는 엄마를 티켓 부스를 지나 건물 현관밖으로 이끌었다.", "blankWord": "booth"}, {"num": 11, "en": "carpet", "ko": "카펫", "pos": "n", "def": "a thick woven cover for a floor", "exEn": "It had already started to cover the ground like a white carpet.", "exKo": "이미 눈이 하얀 카펫처럼 땅을 덮기 시작했다.", "blankWord": "carpet"}, {"num": 12, "en": "footprint", "ko": "발자국", "pos": "n", "def": "a mark made by a human or animal foot", "exEn": "Those are Ava's footprints.", "exKo": "저것들은 Ava의 발자국들이다.", "blankWord": "footprints"}, {"num": 13, "en": "sidewalk", "ko": "보도, 인도", "pos": "n", "def": "a flat part at the side of a road for people to walk on", "exEn": "They led down the sidewalk and around the building.", "exKo": "그들은 건물 주위와 보도를 따라 내려갔다.", "blankWord": "sidewalk"}, {"num": 14, "en": "corner", "ko": "모퉁이, 모서리", "pos": "n", "def": "a place where two sides or walls meet, usually inside a room or a box", "exEn": "When they came around the corner, they stopped short.", "exKo": "그들이 모퉁이를 돌았을 때, 갑자기 멈췄다.", "blankWord": "corner"}, {"num": 15, "en": "puff", "ko": "내뿜다", "pos": "v", "def": "to breathe loudly and quickly", "exEn": "He watched his warm breath puff out into the cold winter air.", "exKo": "그는 차가운 겨울 공기 속에 그의 따뜻한 입김이 뿜어져 나오는 것을 보았다.", "blankWord": "puff"}, {"num": 16, "en": "laughter", "ko": "웃음소리", "pos": "n", "def": "the sound of people laughing", "exEn": "He could hear music and laughter spilling out of the building's big front doors.", "exKo": "그는 음악과 웃음소리가 건물의 큰 현관문에서 흘러나오는 것을 들을 수 있었다.", "blankWord": "laughter"}, {"num": 17, "en": "around", "ko": "빙 둘러", "pos": "adv", "def": "surrounding or on all sides of something or someone", "exEn": "Theo and his mom looked around.", "exKo": "Theo와 엄마는 주변을 둘러보았다.", "blankWord": "around"}, {"num": 18, "en": "scare", "ko": "무섭게 하다", "pos": "v", "def": "to make someone feel frightened", "exEn": "She would get scared without her mom or Theo!", "exKo": "그녀는 엄마 또는 Theo 없이 무서워하고 있을 것이다!", "blankWord": "scared"}, {"num": 19, "en": "front door", "ko": "현관(정문)", "pos": "n", "def": "the main door, which is usually in the wall that faces a street", "exEn": "He led her past the ticket booth and out the front doors of the building.", "exKo": "그는 엄마를 티켓 부스를 지나 건물 현관밖으로 이끌었다.", "blankWord": "front doors"}, {"num": 20, "en": "point", "ko": "가리키다", "pos": "v", "def": "to show something to someone by holding up one of your fingers", "exEn": "Theo pointed down at the snow.", "exKo": "Theo는 아래쪽에 눈을 가리켰다.", "blankWord": "pointed"}, {"num": 21, "en": "shine", "ko": "비추다", "pos": "v", "def": "to produce bright light", "exEn": "The moon and the lights shone brightly on the white snow, showing their way.", "exKo": "달과 빛이 하얀 눈에 밝게 비추어 그들이 가는 길을 보여주었다.", "blankWord": "shone"}, {"num": 22, "en": "brightly", "ko": "밝게", "pos": "adv", "def": "shining strongly, or with much light", "exEn": "The moon and the lights shone brightly on the white snow, showing their way.", "exKo": "달과 빛이 하얀 눈에 밝게 비추어 그들이 가는 길을 보여주었다.", "blankWord": "brightly"}, {"num": 23, "en": "bend", "ko": "굽히다, 구부리다", "pos": "v", "def": "to move the part of your body so that it is not straight", "exEn": "The little girl bent and filled her hands with snow.", "exKo": "작은 소녀는 몸을 굽혀서 그녀의 손에 눈을 가득 채웠다.", "blankWord": "bent"}, {"num": 24, "en": "light", "ko": "비추다", "pos": "v", "def": "to give light to something or to a place", "exEn": "The lights lit the snow, and it was beautiful.", "exKo": "빛은 눈을 비추고, 그것은 아름다웠다.", "blankWord": "lit"}];
+
+const POS_LABEL = {n:'명사 noun', v:'동사 verb', adj:'형용사 adjective', adv:'부사 adverb', prep:'전치사 preposition'};
+
+// ---- floating decoration ----
+function spawnDeco(){
+  const wrap=document.body;
+  const items=['❄️','🎈','🎉','⭐'];
+  for(let i=0;i<14;i++){
+    const el=document.createElement('div');
+    el.className='deco';
+    el.textContent=items[Math.floor(Math.random()*items.length)];
+    el.style.left=(Math.random()*100)+'vw';
+    el.style.animationDuration=(10+Math.random()*12)+'s';
+    el.style.animationDelay=(Math.random()*10)+'s';
+    el.style.fontSize=(1+Math.random()*1.2)+'rem';
+    wrap.appendChild(el);
+  }
+}
+spawnDeco();
+
+let section='en2ko',queue=[],current=0,score=0,answered=false,results=[];
+
+function shuffle(arr){return[...arr].sort(()=>Math.random()-0.5);}
+function getWrong(correct,field,count){return shuffle(VOCAB.filter(v=>v[field]!==correct[field])).slice(0,count).map(v=>v[field]);}
+
+function makeSentenceWithBlank(item){
+  const word=item.blankWord||item.en;
+  const escaped=word.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const regex=new RegExp(`\\b${escaped}\\b`,'i');
+  if(regex.test(item.exEn))return item.exEn.replace(regex,'___BLANK___');
+  const idx=item.exEn.toLowerCase().indexOf(word.toLowerCase());
+  if(idx!==-1)return item.exEn.slice(0,idx)+'___BLANK___'+item.exEn.slice(idx+word.length);
+  return item.exEn+' [___BLANK___]';
+}
+function renderBlank(s,revealed,word){
+  const parts=s.split('___BLANK___');
+  if(!revealed)return parts.join('<span class="blank">?</span>');
+  let r='';parts.forEach((p,i)=>{r+=p;if(i<parts.length-1){r+=`<span class="blank revealed">${word}</span>`;}});
+  return r;
+}
+function buildQueue(){
+  return shuffle(VOCAB).map(item=>{
+    if(section==='en2ko')return{item,section,qTypeLabel:'EN → KO',question:item.en,hint:'이 단어의 뜻으로 알맞은 것은?',correct:item.ko,options:shuffle([item.ko,...getWrong(item,'ko',3)]),isSentence:false};
+    if(section==='ko2en')return{item,section,qTypeLabel:'KO → EN',question:item.ko,hint:'이 뜻에 알맞은 영어 단어는?',correct:item.en,options:shuffle([item.en,...getWrong(item,'en',3)]),isSentence:false};
+    const bc=item.blankWord||item.en;
+    return{item,section,qTypeLabel:'FILL IN THE BLANK',correct:bc,options:shuffle([bc,...getWrong(item,'blankWord',3)]),isSentence:true,sentenceWithBlank:makeSentenceWithBlank(item),sentenceKo:item.exKo};
+  });
+}
+function renderQuestion(){
+  const q=queue[current];
+  const qtEl=document.getElementById('q-type');qtEl.textContent=q.qTypeLabel;qtEl.className=`q-type ${q.section}`;
+  document.getElementById('q-num').textContent=`문제 ${current+1} / ${queue.length}`;
+  const qW=document.getElementById('q-word'),qH=document.getElementById('q-hint');
+  const sB=document.getElementById('sentence-box'),oD=document.getElementById('options');
+  sB.style.display='none';oD.innerHTML='';
+  const ib=document.getElementById('info-box');ib.className='info-box';ib.innerHTML='';
+  if(q.isSentence){
+    qW.style.display='none';qH.style.display='none';sB.style.display='block';
+    document.getElementById('sentence-en').innerHTML=renderBlank(q.sentenceWithBlank,false,'');
+    document.getElementById('sentence-ko').textContent=q.sentenceKo;
+  } else {
+    qW.style.display='block';qH.style.display='block';qW.textContent=q.question;qH.textContent=q.hint;
+  }
+  const keys=['①','②','③','④'];
+  q.options.forEach((opt,i)=>{
+    const btn=document.createElement('button');
+    btn.className='option';
+    btn.innerHTML=`<span class="option-key">${keys[i]}</span>${opt}`;
+    btn.onclick=()=>selectMC(btn,opt,q);
+    oD.appendChild(btn);
+  });
+  document.getElementById('feedback').className='feedback';
+  const nb=document.getElementById('next-btn');nb.classList.remove('show');nb.className=`next-btn ${q.section}`;
+  answered=false;updateProgress();
+}
+function showInfo(item){
+  const ib=document.getElementById('info-box');
+  ib.innerHTML=`<span class="pos-chip">${POS_LABEL[item.pos]||item.pos}</span>📖 ${item.def}`;
+  ib.classList.add('show');
+}
+function selectMC(btn,selected,q){
+  if(answered)return;answered=true;
+  document.querySelectorAll('.option').forEach(b=>{
+    b.disabled=true;
+    if(b.textContent.replace(/[①②③④]/,'').trim()===q.correct)b.classList.add('correct');
+  });
+  if(q.isSentence)document.getElementById('sentence-en').innerHTML=renderBlank(q.sentenceWithBlank,true,q.correct);
+  const fb=document.getElementById('feedback');
+  if(selected===q.correct){
+    btn.classList.add('correct');fb.className='feedback correct show';fb.textContent='🎉 정답이에요!';
+    score++;results.push({item:q.item,ok:true});
+  } else {
+    btn.classList.add('wrong');fb.className='feedback wrong show';fb.textContent=`😅 아쉬워요 — 정답: ${q.correct}`;
+    results.push({item:q.item,ok:false});
+  }
+  showInfo(q.item);
+  document.getElementById('score-label').textContent=`⭐ 정답 ${score}`;
+  document.getElementById('next-btn').classList.add('show');
+}
+function next(){current++;if(current>=queue.length)showResult();else renderQuestion();}
+function updateProgress(){
+  const pct=queue.length?(current/queue.length*100):0;
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-fill').className=`progress-fill fill-${section}`;
+  document.getElementById('prog-label').textContent=`${current+1} / ${queue.length}`;
+}
+function showResult(){
+  document.getElementById('quiz-card').style.display='none';
+  document.querySelector('.nav').style.display='none';
+  document.getElementById('result').classList.add('show');
+  document.getElementById('prog-fill').style.width='100%';
+  document.getElementById('prog-label').textContent=`${queue.length} / ${queue.length}`;
+  const pct=Math.round(score/queue.length*100);
+  const scoreEl=document.getElementById('result-score');
+  scoreEl.textContent=`${score} / ${queue.length}`;
+  scoreEl.className=`result-score score-${section}`;
+  document.getElementById('result-emoji').textContent = pct>=80?'🏆':pct>=60?'🎈':'💪';
+  document.getElementById('result-sub').textContent=`정답률 ${pct}% — ${pct>=80?'최고예요! 완전 축제 스타!':pct>=60?'잘했어요! 조금만 더 연습해봐요.':'괜찮아요, 다시 한 번 도전해봐요!'}`;
+  document.getElementById('breakdown').innerHTML=results.map(r=>`<div class="breakdown-row"><div class="breakdown-q">${r.item.en} — ${r.item.ko}</div><span class="breakdown-status ${r.ok?'ok':'fail'}">${r.ok?'✅':'❌'}</span></div>`).join('');
+  const others=['en2ko','ko2en','blank'].filter(s=>s!==section);
+  const labels={en2ko:'🎪 영어→한국어',ko2en:'🎡 한국어→영어',blank:'🎠 예문 빈칸'};
+  document.getElementById('result-actions').innerHTML=`<button class="ra-btn p-${section}" onclick="startQuiz()">🔄 다시 풀기</button>`+others.map(s=>`<button class="ra-btn" onclick="switchSection('${s}')">${labels[s]}</button>`).join('');
+}
+function switchSection(s){
+  section=s;
+  document.querySelectorAll('.section-tab').forEach((b,i)=>{
+    const sects=['en2ko','ko2en','blank'];
+    b.className=`section-tab${s===sects[i]?' active-'+sects[i]:''}`;
+  });
+  startQuiz();
+}
+function startQuiz(){
+  queue=buildQueue();current=0;score=0;answered=false;results=[];
+  document.getElementById('score-label').textContent='⭐ 정답 0';
+  document.getElementById('quiz-card').style.display='block';
+  document.querySelector('.nav').style.display='flex';
+  document.getElementById('result').classList.remove('show');
+  renderQuestion();
+}
+function toggleData(){
+  const c=document.getElementById('data-content'),t=document.getElementById('data-toggle');
+  c.classList.toggle('open');
+  t.textContent=c.classList.contains('open')?'접기 ▴':'펼치기 ▾';
+}
+document.getElementById('data-content').innerHTML = VOCAB.map(v=>`<div class="data-item"><b>${v.num}. ${v.en}</b> (${POS_LABEL[v.pos]||v.pos}) — ${v.ko}<br><span style="color:var(--muted)">${v.exEn}</span></div>`).join('');
+
+startQuiz();
+</script>
+</body>
+</html>
